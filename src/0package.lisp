@@ -41,7 +41,10 @@ Advantages over the existing libraries:
 + The output is a common-doc object. Easily pluggable to the existing emitter
   supportd for common-doc objects.
 
-"))
+")
+  (:export
+   #:extract-document-from-system
+   #:extract-document-from-file))
 
 (in-package :eazy-documentation)
 

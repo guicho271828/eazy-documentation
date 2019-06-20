@@ -1,6 +1,8 @@
 (in-package :eazy-documentation)
 
 (defvar *definitions*)
+(defvar *old-macroexpand-hook*)
+(defvar *deferred-tasks*)
 
 (defun add-definition (&rest initargs &key doctype name args docstring)
   (declare (ignore doctype name args docstring))
@@ -11,8 +13,6 @@
         (merge-slot obj it 'docstring))
       (vector-push-extend obj *definitions* (max 1 (length *definitions*))))))
 
-
-(defvar *old-macroexpand-hook*)
 (defun call-with-extracting-document (fn)
   (let* ((*definitions* (make-array 128 :adjustable t :fill-pointer 0))
          (*deferred-tasks* nil)
@@ -81,8 +81,6 @@
            (setf (getf acc :docstring) docstring)))))
      
      (apply #'add-definition acc))))
-
-(defvar *deferred-tasks*)
 
 (defun parse-setf (args)
   (match args
