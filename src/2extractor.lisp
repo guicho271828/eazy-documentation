@@ -1,45 +1,5 @@
 (in-package :eazy-documentation)
 
-(defclass definition ()
-  ((doctype :accessor doctype :initarg :doctype)
-   (name :accessor name :initarg :name)
-   (args :accessor args :initarg :args)
-   (docstring :accessor docstring :initarg :docstring))
-  (:documentation "Instances represententing a documentation entry."))
-
-(defun definition= (a b)
-  "Compare the name, doctype, docstring by EQ. Returns true when they look same.
-
-Docstring are compared because the same function could be recognized multiple
-times when a macro expands into another macro (e.g. defrule -> defun).
-In such a case, the docstring objects are most likely the same object (by EQ)."
-  (match* (a b)
-    (((definition :doctype (place d1) :name (place n1) :docstring (place s1))
-      (definition :doctype (place d2) :name (place n2) :docstring (place s2)))
-     #+(or)
-     (<= 2 (count t (vector (eq (ignore-errors n1)
-                                (ignore-errors n2))
-                            (eq (ignore-errors s1)
-                                (ignore-errors s2))
-                            (eq (ignore-errors d1)
-                                (ignore-errors d2)))))
-     (and (eq (ignore-errors n1)
-              (ignore-errors n2))
-          (or 
-           (eq (ignore-errors s1)
-               (ignore-errors s2))
-           (eq (ignore-errors d1)
-               (ignore-errors d2)))))))
-
-(defun left (a b) (declare (ignore b)) a)
-(defun merge-slot (from to slot &optional (fn #'left))
-  (when (slot-boundp from slot)
-    (if (slot-boundp to slot)
-        (progn
-          (simple-style-warning "overwriting ~a for ~a/~a" slot (doctype to) (name to))
-          (setf (slot-value to slot) (funcall fn (slot-value to slot) (slot-value from slot))))
-        (setf (slot-value to slot) (slot-value from slot)))))
-
 (defvar *definitions*)
 
 (defun add-definition (&rest initargs &key doctype name args docstring)
@@ -51,7 +11,6 @@ In such a case, the docstring objects are most likely the same object (by EQ)."
         (merge-slot obj it 'docstring))
       (vector-push-extend obj *definitions* (max 1 (length *definitions*))))))
 
-;;;;
 
 (defvar *old-macroexpand-hook*)
 (defun call-with-extracting-document (fn)
@@ -150,8 +109,6 @@ In such a case, the docstring objects are most likely the same object (by EQ)."
                *deferred-tasks*)))
      (parse-setf rest))))
 
-
-
 (defun extract-document-from-file (file)
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-document
@@ -159,5 +116,15 @@ In such a case, the docstring objects are most likely the same object (by EQ)."
        (compile-file file :output-file p)
        (when *deferred-tasks*
          (load p)
+         (mapc #'funcall *deferred-tasks*))
+       *definitions*))))
+
+(defun extract-document-from-system (system)
+  (uiop:with-temporary-file (:pathname p)
+    (call-with-extracting-document
+     (lambda ()
+       (asdf:compile-system system)
+       (when *deferred-tasks*
+         (asdf:load-system system)
          (mapc #'funcall *deferred-tasks*))
        *definitions*))))

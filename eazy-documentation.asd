@@ -15,5 +15,6 @@
  :pathname "src/"
  :serial t
  :components ((:file "0package")
-              (:file "1extractor"))
+              (:file "1definition")
+              (:file "2extractor"))
  :description "Heuristic documentation extraction library")
