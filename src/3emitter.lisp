@@ -1,15 +1,12 @@
 (in-package :eazy-documentation)
 
-(defun emit-defs (defs
-                         pathname
-                         &rest
-                           rest
-                         &key
-                           (title "(no title)")
-                           (toc t)
-                           (whitelist nil)
-                           (blacklist '(:asdf))
-                           (max-depth 1))
+(defun emit-defs (defs pathname &rest rest
+                  &key
+                    (title "(no title)")
+                    (toc t)
+                    (whitelist nil)
+                    (blacklist '(:asdf))
+                    (max-depth 1))
   (let ((node (apply #'generate-doc defs :allow-other-keys t rest)))
     (if (member (pathname-type pathname)
                 '("html" "htm")
@@ -88,13 +85,29 @@
         (finally
          (make-section title :children (reverse tmp-sections)))))
 
+(defun span (string &rest classes)
+  (make-text string :metadata (plist-hash-table `("html:class" ,(format nil "~{~a~^,~}" classes)))))
 
-(defun make-section-from-similar-defs (defs)
+(defun make-section-from-similar-defs (defs mode)
   (ecase mode
     (:missing-docs
-     (make-section
-      :children
-      (make-text (doctype (first-elt defs)) 
-  
-  
-  )
+     (make-content
+      (list* (span (doctype (first-elt defs)) "doctype")
+             (iter (for def in defs)
+                   (collecting
+                     (span (name def) "name" (doctype def))))
+             (span "(documentation missing)" "docstring-missing"))))
+    (:shared-docstring
+     (make-content
+      (list* (span (doctype (first-elt defs)) "doctype")
+             (iter (for def in defs)
+                   (collecting
+                     (span (name def) "name" (doctype def))))
+             (span (docstring (first-elt defs)) "docstring"))))
+    (:same-name
+     (make-content
+      (list* (iter (for def in defs)
+                   (collecting
+                     (span (doctype def) "doctype")))
+             (span (name (first-elt defs)) "name")
+             (span (docstring (first-elt defs)) "docstring"))))))
