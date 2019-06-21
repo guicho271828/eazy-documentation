@@ -1,20 +1,20 @@
 (in-package :eazy-documentation)
 
-(defvar *definitions*)
+(defvar *defs*)
 (defvar *old-macroexpand-hook*)
 (defvar *deferred-tasks*)
 
-(defun add-definition (&rest initargs &key doctype name args docstring)
+(defun add-def (&rest initargs &key doctype name args docstring)
   (declare (ignore doctype name args docstring))
-  (let ((obj (apply #'make-instance 'definition initargs)))
-    (if-let ((it (find obj *definitions* :test #'definition=)))
+  (let ((obj (apply #'make-instance 'def initargs)))
+    (if-let ((it (find obj *defs* :test #'def=)))
       (progn
         (merge-slot obj it 'args)
         (merge-slot obj it 'docstring))
-      (vector-push-extend obj *definitions* (max 1 (length *definitions*))))))
+      (vector-push-extend obj *defs* (max 1 (length *defs*))))))
 
 (defun call-with-extracting-document (fn)
-  (let* ((*definitions* (make-array 128 :adjustable t :fill-pointer 0))
+  (let* ((*defs* (make-array 128 :adjustable t :fill-pointer 0))
          (*deferred-tasks* nil)
          (*old-macroexpand-hook* *macroexpand-hook*)
          (*macroexpand-hook* 'expand-extracting-document))
@@ -107,7 +107,7 @@
                         (setf (getf acc :docstring) docstring)))))
             (rec (flatten form))))))
      
-     (apply #'add-definition acc))))
+     (apply #'add-def acc))))
 
 (defun parse-setf (args)
   (match args
@@ -118,19 +118,19 @@
        (let ((name (eval nameform))
              (type (eval typeform)))
          (push (lambda ()
-                 (add-definition :name name
-                                 :doctype (case type
-                                            (function 'defun)
-                                            (variable
-                                             (if (constantp name)
-                                                 'defconstant
-                                                 'defvar))
-                                            (structure 'defstruct)
-                                            (type 'deftype)
-                                            (method-combination 'define-method-combination)
-                                            (setf 'defsetf)
-                                            (compiler-macro 'define-compiler-macro))
-                                 :docstring (documentation name type)))
+                 (add-def :name name
+                          :doctype (case type
+                                     (function 'defun)
+                                     (variable
+                                      (if (constantp name)
+                                          'defconstant
+                                          'defvar))
+                                     (structure 'defstruct)
+                                     (type 'deftype)
+                                     (method-combination 'define-method-combination)
+                                     (setf 'defsetf)
+                                     (compiler-macro 'define-compiler-macro))
+                          :docstring (documentation name type)))
                *deferred-tasks*)))
      (parse-setf rest))))
 
@@ -142,7 +142,7 @@
        (when *deferred-tasks*
          (load p)
          (mapc #'funcall *deferred-tasks*))
-       *definitions*))))
+       *defs*))))
 
 (defun extract-document-from-system (system)
   (uiop:with-temporary-file (:pathname p)
@@ -158,4 +158,4 @@
        (when *deferred-tasks*
          (asdf:load-system system)
          (mapc #'funcall *deferred-tasks*))
-       *definitions*))))
+       *defs*))))

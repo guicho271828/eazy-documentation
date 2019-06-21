@@ -1,7 +1,7 @@
 (in-package :eazy-documentation)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-(defclass definition ()
+(defclass def ()
   ((doctype   :accessor   doctype :initarg :doctype   :type symbol)
    (name      :accessor      name :initarg :name      :type symbol)
    (args      :accessor      args :initarg :args      :type list)
@@ -11,20 +11,20 @@
   (:documentation "Instances represententing a documentation entry."))
 )
 
-(defun definition= (a b)
+(defun def= (a b)
   "Compare the name and the doctype. Returns true when they are all EQ."
   (match* (a b)
-    (((definition :doctype d1 :name n1)
-      (definition :doctype d2 :name n2))
+    (((def :doctype d1 :name n1)
+      (def :doctype d2 :name n2))
      (and (eq d1 d2)
           (eq n1 n2)))))
 
-(defun definition~ (a b)
+(defun def~ (a b)
   "Compare the name, doctype, docstring by EQ.
  Returns true when they look same according to a heuristic rule."
   (match* (a b)
-    (((definition :doctype d1 :name n1 :file f1 :docstring (place s1))
-      (definition :doctype d2 :name n2 :file f2 :docstring (place s2)))
+    (((def :doctype d1 :name n1 :file f1 :docstring (place s1))
+      (def :doctype d2 :name n2 :file f2 :docstring (place s2)))
      (let* ((name    (eq n1 n2))
             (doctype (eq d1 d2))
             (file    (equal f1 f2))
