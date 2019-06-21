@@ -23,5 +23,6 @@
  :components ((:file "0package")
               (:file "1definition")
               (:file "2extractor")
-              (:file "3emitter"))
+              (:file "3emitter")
+              (:file "4user"))
  :description "Heuristic documentation extraction library")

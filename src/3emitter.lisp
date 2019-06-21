@@ -1,14 +1,15 @@
 (in-package :eazy-documentation)
 
-(defun emit-defs (defs pathname &rest rest
-                  &key
-                    (title "(no title)")
-                    (toc t)
-                    (whitelist nil)
-                    (blacklist '(:asdf))
-                    (max-depth 1))
+(defun generate-html (defs pathname &rest rest
+                      &key
+                        (title "(no title)")
+                        (toc t)
+                        (whitelist nil)
+                        (blacklist '(:asdf))
+                        (max-depth 1))
   (declare (ignorable title toc whitelist blacklist max-depth))
-  (let ((node (apply #'generate-doc defs :allow-other-keys t rest)))
+  (let ((node (apply #'generate-commondoc defs :allow-other-keys t rest)))
+    (ensure-directories-exist pathname)
     (if (member (pathname-type pathname)
                 '("html" "htm")
                 :test 'string-equal)
@@ -17,7 +18,7 @@
                            :if-exists :supersede
                            :if-does-not-exist :create)
           (when toc
-            (write (common-html.toc:single-file-toc node :max-depth max-depth) :stream s))
+            (write-string (common-html.toc:single-file-toc node :max-depth max-depth) s))
           (common-html.emitter:node-to-stream node s))
         (let ((directory (uiop:ensure-directory-pathname pathname)))
           (when toc
@@ -25,22 +26,35 @@
                                :direction :output
                                :if-exists :supersede
                                :if-does-not-exist :create)
-              (write (common-html.toc:multi-file-toc node :max-depth max-depth) :stream s)))
+              (write-string (common-html.toc:multi-file-toc node :max-depth max-depth) s)))
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))))
 
-(defun generate-doc (defs
-                     &key
-                       (title "(no title)")
-                       (whitelist nil)
-                       (blacklist '(:asdf)))
+(defun generate-commondoc (defs
+                           &key
+                             (title "(no title)")
+                             (whitelist nil)
+                             (blacklist '(:asdf)))
+  (setf blacklist (mapcar #'find-package blacklist))
+  (setf whitelist (mapcar #'find-package whitelist))
+
+  (setf defs
+        (delete-if
+         (lambda (def)
+           (ematch def
+             ((class def name)
+              ;; skip if the name is in the blacklist
+              (or (some (curry #'find-symbol (symbol-name name)) blacklist)
+                  (and whitelist
+                       ;; skip if the name is not in the whitelist, if provided
+                       (notany (curry #'find-symbol (symbol-name name)) whitelist))))))
+         defs))
+  
   (iter (for def in-vector defs)
         (for pdef previous def)
-        (with blacklist = (mapcar #'find-package blacklist))
-        (with whitelist = (mapcar #'find-package whitelist))
+        (with tmp-defs = nil)
         (with tmp-sections = nil)
         (with tmp-dir-sections = nil)
         (with tmp-file-sections = nil)
-        (with tmp-defs = nil)
 
         (for pfile =
              (when (not (first-iteration-p))
@@ -49,19 +63,29 @@
              (when (not (first-iteration-p))
                (def~ def pdef)))
         (for pmode previous mode)
+        (for i from 0)
         
+
+        ;; (break)
         (ematch def
-          ((class def name file)
+          ((class def file)
            
-           ;; skip if the name is in the blacklist
-           (when (some (curry #'find-symbol (symbol-name name)) blacklist)
-             (next-iteration))
+           ;; make a new section when the new def should not be grouped
+           (when (and (not (first-iteration-p))
+                      (not compatible))
+             (push (make-section-from-similar-defs (reverse tmp-defs) pmode)
+                   tmp-file-sections)
+             (setf tmp-defs nil))
 
-           ;; skip if the name is not in the whitelist, if provided
-           (when whitelist
-             (unless (some (curry #'find-symbol (symbol-name name)) whitelist)
-               (next-iteration)))
-
+           ;; make a new section across the file boundary
+           (when (and (not (first-iteration-p))
+                      (not (equal file pfile)))
+             (push
+              (make-section (make-text (pathname-name pfile))
+                            :children (reverse tmp-file-sections))
+              tmp-dir-sections)
+             (setf tmp-file-sections nil))
+           
            ;; make a new section across the directory boundary
            (when (and (not (first-iteration-p))
                       (not (equal (pathname-directory file)
@@ -73,51 +97,67 @@
               tmp-sections)
              (setf tmp-dir-sections nil))
            
-           ;; make a new section across the file boundary
-           (when (and (not (first-iteration-p))
-                      (not (equal file pfile)))
-             (push
-              (make-section (make-text (pathname-name pfile))
-                            :children (reverse tmp-file-sections))
-              tmp-dir-sections)
-             (setf tmp-file-sections nil))
-
-           ;; make a new section when the new def should not be grouped
-           (when (and (not (first-iteration-p))
-                      compatible (eq mode pmode))
-             (push (make-section-from-similar-defs (reverse tmp-defs) mode)
-                   tmp-file-sections)
-             (setf tmp-defs nil))
-           
            (push def tmp-defs)))
 
         (finally
+         (when tmp-defs
+           (push
+            (make-section-from-similar-defs (reverse tmp-defs) mode)
+            tmp-file-sections))
+         (when tmp-file-sections
+           (push
+            (make-section (make-text (pathname-name pfile))
+                          :children (reverse tmp-file-sections))
+            tmp-dir-sections))
+         (when tmp-dir-sections
+           (push
+            (make-section (make-text
+                           (namestring (make-pathname :name nil :type nil :defaults pfile)))
+                          :children (reverse tmp-dir-sections))
+            tmp-sections))
          (return
            (make-document (make-text title) :children (reverse tmp-sections))))))
 
 (defun span (string &rest classes)
-  (make-text string :metadata (plist-hash-table `("html:class" ,(format nil "~{~a~^,~}" classes)))))
+  (make-text (string string) :metadata (plist-hash-table `("html:class" ,(format nil "~{~a~^,~}" classes)))))
 
 (defun make-section-from-similar-defs (defs mode)
   (ecase mode
     (:missing-docs
-     (make-content
-      (list* (span (doctype (first-elt defs)) "doctype")
-             (iter (for def in defs)
-                   (collecting
-                     (span (name def) "name" (doctype def))))
-             (span "(documentation missing)" "docstring-missing"))))
+     (make-paragraph
+      (append (list (span (doctype (first-elt defs)) "doctype"))
+              (iter (for def in defs)
+                    (collecting
+                      (span (name def) "name" (doctype def))))
+              (list (span "(documentation missing)" "docstring-missing")))))
     (:shared-docstring
-     (make-content
-      (list* (span (doctype (first-elt defs)) "doctype")
-             (iter (for def in defs)
-                   (collecting
-                     (span (name def) "name" (doctype def))))
-             (span (docstring (first-elt defs)) "docstring"))))
+     (make-paragraph
+      (append (list (span (doctype (first-elt defs)) "doctype"))
+              (iter (for def in defs)
+                    (collecting
+                      (span (name def) "name" (doctype def))))
+              (list (span (docstring (first-elt defs)) "docstring")))))
     (:same-name
-     (make-content
-      (list* (iter (for def in defs)
-                   (collecting
-                     (span (doctype def) "doctype")))
-             (span (name (first-elt defs)) "name")
-             (span (docstring (first-elt defs)) "docstring"))))))
+     (make-paragraph
+      (append (iter (for def in defs)
+                    (collecting
+                      (span (doctype def) "doctype")))
+              (list (span (name (first-elt defs)) "name")
+                    (span (iter (for def in defs)
+                                (for docstring = (ignore-errors (docstring def)))
+                                (finding docstring
+                                         such-that docstring
+                                         on-failure "(documentation missing)"))
+                          "docstring")))))
+    ((nil)
+     (assert (= 1 (length defs)))
+     (make-paragraph
+      (iter (for def in defs)
+            (collecting
+              (span (doctype def) "doctype"))
+            (collecting
+              (span (name def) "name"))
+            (collecting
+              (span (or (ignore-errors (docstring def))
+                        "(documentation missing)")
+                    "docstring")))))))

@@ -13,20 +13,20 @@
         (merge-slot obj it 'docstring))
       (vector-push-extend obj *defs* (max 1 (length *defs*))))))
 
-(defun call-with-extracting-document (fn)
+(defun call-with-extracting-definitions (fn)
   (let* ((*defs* (make-array 128 :adjustable t :fill-pointer 0))
          (*deferred-tasks* nil)
          (*old-macroexpand-hook* *macroexpand-hook*)
-         (*macroexpand-hook* 'expand-extracting-document))
+         (*macroexpand-hook* 'expand-extracting-definitions))
     (funcall fn)))
 
-(defun expand-extracting-document (expander form env)
-  (handler-case (extract-document form)
+(defun expand-extracting-definitions (expander form env)
+  (handler-case (extract-definitions form)
     (error (c)
       (note "~&Failed parsing ~a due to ~a" form (type-of c))))
   (funcall *old-macroexpand-hook* expander form env))
 
-(defun extract-document (form)
+(defun extract-definitions (form)
   (match form
     ((list* 'setf args)
      (parse-setf args))
@@ -45,16 +45,16 @@
                                   ;; from http://www.cs.cmu.edu/~cburch/words/top.html
                                   ;; 483726.84 / 1000000 of words consume this
                                   `("the" "of" "and" "to" "a" "in" "is" "that" "was" "it" "for" "on" "with" "he" "be" "I"
-                                    "by" "as" "at" "you" "are" "his" "had" "not" "this" "have" "from" "but" "which" "she"
-                                    "they" "or" "an" "her" "were" "there" "we" "their" "been" "has" "will" "one" "all"
-                                    "would" "can" "if" "who" "more" "when" "said" "do" "what" "about" "its" "so" "up"
-                                    "into" "no" "him" "some" "could" "them" "only" "time" "out" "my" "two" "other"
-                                    "then" "may" "over" "also" "new" "like" "these" "me" "after" "first" "your" "did"
-                                    "now" "any" "people" "than" "should" "very" "most" "see" "where" "just" "made"
-                                    "between" "back" "way" "many" "years" "being" "our" "how" "work"
-                                    ;; lisp-specific keywords
-                                    ,@(iter (for s in-package :cl external-only t)
-                                            (collecting (symbol-name s))))
+                                          "by" "as" "at" "you" "are" "his" "had" "not" "this" "have" "from" "but" "which" "she"
+                                          "they" "or" "an" "her" "were" "there" "we" "their" "been" "has" "will" "one" "all"
+                                          "would" "can" "if" "who" "more" "when" "said" "do" "what" "about" "its" "so" "up"
+                                          "into" "no" "him" "some" "could" "them" "only" "time" "out" "my" "two" "other"
+                                          "then" "may" "over" "also" "new" "like" "these" "me" "after" "first" "your" "did"
+                                          "now" "any" "people" "than" "should" "very" "most" "see" "where" "just" "made"
+                                          "between" "back" "way" "many" "years" "being" "our" "how" "work"
+                                          ;; lisp-specific keywords
+                                          ,@(iter (for s in-package :cl external-only t)
+                                                  (collecting (symbol-name s))))
                                   :test #'string-equal))))
               (result (and (< 2 (length words))
                            (<= 0.1
@@ -162,28 +162,3 @@
                *deferred-tasks*)))
      (parse-setf rest))))
 
-(defun extract-document-from-file (file)
-  (uiop:with-temporary-file (:pathname p)
-    (call-with-extracting-document
-     (lambda ()
-       (compile-file file :output-file p)
-       (when *deferred-tasks*
-         (load p)
-         (mapc #'funcall *deferred-tasks*))
-       *defs*))))
-
-(defun extract-document-from-system (system)
-  (uiop:with-temporary-file (:pathname p)
-    (call-with-extracting-document
-     (lambda ()
-       (with-compilation-unit ()
-         (let ((*compile-print* nil)
-               (*compile-verbose* nil))
-           (let ((*package* (find-package :asdf)))
-             (compile-file (asdf:system-source-file system) :output-file p))
-           (asdf:clear-system system)
-           (asdf:compile-system system :verbose nil :force t)))
-       (when *deferred-tasks*
-         (asdf:load-system system)
-         (mapc #'funcall *deferred-tasks*))
-       *defs*))))

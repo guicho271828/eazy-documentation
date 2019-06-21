@@ -43,8 +43,12 @@ Advantages over the existing libraries:
 
 ")
   (:export
-   #:extract-document-from-system
-   #:extract-document-from-file))
+   #:extract-definitions-from-file
+   #:extract-definitions-from-system
+   #:generate-commondoc-from-file
+   #:generate-commondoc-from-system
+   #:generate-html-from-file
+   #:generate-html-from-system))
 
 (in-package :eazy-documentation)
 
