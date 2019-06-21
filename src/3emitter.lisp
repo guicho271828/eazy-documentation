@@ -60,42 +60,38 @@
         (for pmode previous mode)
         (for i from 0)
         
+        (when (not (first-iteration-p))
+          (ematch def
+            ((class def file)
 
-        ;; (break)
-        (ematch def
-          ((class def file)
-           
-           ;; make a new section when the new def should not be grouped
-           (when (and (not (first-iteration-p))
-                      (not compatible))
-             (push (make-section-from-similar-defs (reverse tmp-defs) pmode)
-                   tmp-file-sections)
-             (setf tmp-defs nil))
+             ;; make a new section when the new def should not be grouped
+             (when (not compatible)
+               (push (make-section-from-similar-defs (reverse tmp-defs) pmode)
+                     tmp-file-sections)
+               (setf tmp-defs nil))
 
-           ;; make a new section across the file boundary
-           (when (and (not (first-iteration-p))
-                      (not (equal file pfile)))
-             (push
-              (make-section (make-text
-                             (pathname-name pfile)
-                             :metadata (plist-hash-table '("html:class" "file")))
-                            :children (reverse tmp-file-sections))
-              tmp-dir-sections)
-             (setf tmp-file-sections nil))
+             ;; make a new section across the file boundary
+             (when (not (equal file pfile))
+               (push
+                (make-section (make-text
+                               (pathname-name pfile)
+                               :metadata (plist-hash-table '("html:class" "file")))
+                              :children (reverse tmp-file-sections))
+                tmp-dir-sections)
+               (setf tmp-file-sections nil))
+             
+             ;; make a new section across the directory boundary
+             (when (not (equal (pathname-directory file)
+                               (pathname-directory pfile)))
+               (push
+                (make-section (make-text
+                               (lastcar (pathname-directory pfile))
+                               :metadata (plist-hash-table '("html:class" "directory")))
+                              :children (reverse tmp-dir-sections))
+                tmp-sections)
+               (setf tmp-dir-sections nil)))))
            
-           ;; make a new section across the directory boundary
-           (when (and (not (first-iteration-p))
-                      (not (equal (pathname-directory file)
-                                  (pathname-directory pfile))))
-             (push
-              (make-section (make-text
-                             (lastcar (pathname-directory pfile))
-                             :metadata (plist-hash-table '("html:class" "directory")))
-                            :children (reverse tmp-dir-sections))
-              tmp-sections)
-             (setf tmp-dir-sections nil))
-           
-           (push def tmp-defs)))
+        (push def tmp-defs)
 
         (finally
          (when tmp-defs
