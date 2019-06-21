@@ -6,7 +6,7 @@
                         (toc t)
                         (whitelist nil)
                         (blacklist '(:asdf))
-                        (max-depth 1))
+                        (max-depth 2))
   (declare (ignorable title toc whitelist blacklist max-depth))
   (let ((node (apply #'generate-commondoc defs :allow-other-keys t rest)))
     (ensure-directories-exist pathname)
@@ -17,24 +17,18 @@
                            :direction :output
                            :if-exists :supersede
                            :if-does-not-exist :create)
-          (when toc
-            (write-string (common-html.toc:single-file-toc node :max-depth max-depth) s))
           (common-html.emitter:node-to-stream node s))
         (let ((directory (uiop:ensure-directory-pathname pathname)))
-          (when toc
-            (with-open-file (s (merge-pathnames "index.html" directory)
-                               :direction :output
-                               :if-exists :supersede
-                               :if-does-not-exist :create)
-              (write-string (common-html.toc:multi-file-toc node :max-depth max-depth) s)))
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
 (defun generate-commondoc (defs
                            &key
                              (title "(no title)")
+                             (toc t)
                              (whitelist nil)
-                             (blacklist '(:asdf)))
+                             (blacklist '(:asdf))
+                             (max-depth 2))
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
 
@@ -82,7 +76,9 @@
            (when (and (not (first-iteration-p))
                       (not (equal file pfile)))
              (push
-              (make-section (make-text (pathname-name pfile))
+              (make-section (make-text
+                             (pathname-name pfile)
+                             :metadata (plist-hash-table '("html:class" "file")))
                             :children (reverse tmp-file-sections))
               tmp-dir-sections)
              (setf tmp-file-sections nil))
@@ -93,7 +89,8 @@
                                   (pathname-directory pfile))))
              (push
               (make-section (make-text
-                             (namestring (make-pathname :name nil :type nil :defaults pfile)))
+                             (namestring (make-pathname :name nil :type nil :defaults pfile))
+                             :metadata (plist-hash-table '("html:class" "directory")))
                             :children (reverse tmp-dir-sections))
               tmp-sections)
              (setf tmp-dir-sections nil))
@@ -107,17 +104,28 @@
             tmp-file-sections))
          (when tmp-file-sections
            (push
-            (make-section (make-text (pathname-name pfile))
+            (make-section (make-text
+                           (pathname-name pfile)
+                           :metadata (plist-hash-table '("html:class" "file")))
                           :children (reverse tmp-file-sections))
             tmp-dir-sections))
          (when tmp-dir-sections
            (push
             (make-section (make-text
-                           (namestring (make-pathname :name nil :type nil :defaults pfile)))
+                           (namestring (make-pathname :name nil :type nil :defaults pfile))
+                           :metadata (plist-hash-table '("html:class" "directory")))
                           :children (reverse tmp-dir-sections))
             tmp-sections))
-         (return
-           (make-document (make-text title) :children (reverse tmp-sections))))))
+
+         (let ((doc (make-document title :children (reverse tmp-sections))))
+           (when toc
+             (common-doc.ops:fill-unique-refs doc)
+             (push (make-section
+                    (make-text "Index")
+                    :children
+                    (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
+                   (children doc)))
+           (return doc)))))
 
 (defun span (string &rest classes)
   (make-text (string string) :metadata (plist-hash-table `("html:class" ,(format nil "~{~a~^,~}" classes)))))

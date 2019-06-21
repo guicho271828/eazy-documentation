@@ -45,7 +45,7 @@
                                   (toc t)
                                   (whitelist nil)
                                   (blacklist '(:asdf))
-                                  (max-depth 1))
+                                  (max-depth 2))
   (declare (ignorable title toc whitelist blacklist max-depth))
   (apply #'generate-html
          (extract-definitions-from-file file)
@@ -58,7 +58,7 @@
                                     (toc t)
                                     (whitelist nil)
                                     (blacklist '(:asdf))
-                                    (max-depth 1))
+                                    (max-depth 2))
   (declare (ignorable title toc whitelist blacklist max-depth))
   (apply #'generate-html
          (extract-definitions-from-system system)
