@@ -11,10 +11,15 @@
  :mailto "guicho2.71828@gmail.com"
  :license "LGPL"
  :depends-on (:trivia
-              :alexandria)
+              :alexandria
+              :iterate
+              :common-doc
+              :common-html
+              :common-doc-split-paragraphs)
  :pathname "src/"
  :serial t
  :components ((:file "0package")
               (:file "1definition")
-              (:file "2extractor"))
+              (:file "2extractor")
+              (:file "3emitter"))
  :description "Heuristic documentation extraction library")
