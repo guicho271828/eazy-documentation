@@ -23,13 +23,7 @@
 (defun expand-extracting-document (expander form env)
   (handler-case (extract-document form)
     (error (c)
-      (fresh-line *error-output*)
-      (let ((*print-right-margin* 100)
-            (*print-length* 4)
-            (*print-pretty* t))
-        (pprint-logical-block (*error-output* nil :per-line-prefix "; ")
-          (format *error-output*
-                  "~&Failed parsing ~a due to ~a" form (type-of c))))))
+      (note "~&Failed parsing ~a due to ~a" form (type-of c))))
   (funcall *old-macroexpand-hook* expander form env))
 
 (defun extract-document (form)
@@ -42,26 +36,37 @@
          (parse-def form))))))
 
 (defun natural-language-string-p (string)
+  "Heuristic decision to prune non-docstring"
   (and (stringp string)
-       (let ((words (ppcre:split " +" string)))
-         (<= 1/4
-             (/ (iter (for word in words)
-                      (counting
-                       (find word
-                             ;; from http://www.cs.cmu.edu/~cburch/words/top.html
-                             ;; 483726.84 / 1000000 of words consume this
-                             #("the" "of" "and" "to" "a" "in" "is" "that" "was" "it" "for" "on" "with" "he" "be" "I"
-                               "by" "as" "at" "you" "are" "his" "had" "not" "this" "have" "from" "but" "which" "she"
-                               "they" "or" "an" "her" "were" "there" "we" "their" "been" "has" "will" "one" "all"
-                               "would" "can" "if" "who" "more" "when" "said" "do" "what" "about" "its" "so" "up"
-                               "into" "no" "him" "some" "could" "them" "only" "time" "out" "my" "two" "other"
-                               "then" "may" "over" "also" "new" "like" "these" "me" "after" "first" "your" "did"
-                               "now" "any" "people" "than" "should" "very" "most" "see" "where" "just" "made"
-                               "between" "back" "way" "many" "years" "being" "our" "how" "work"))))
-                (max 1 (length words)))))))
+       (let* ((words (ppcre:split " +" string))
+              (count (iter (for word in words)
+                           (counting
+                            (find word
+                                  ;; from http://www.cs.cmu.edu/~cburch/words/top.html
+                                  ;; 483726.84 / 1000000 of words consume this
+                                  `("the" "of" "and" "to" "a" "in" "is" "that" "was" "it" "for" "on" "with" "he" "be" "I"
+                                    "by" "as" "at" "you" "are" "his" "had" "not" "this" "have" "from" "but" "which" "she"
+                                    "they" "or" "an" "her" "were" "there" "we" "their" "been" "has" "will" "one" "all"
+                                    "would" "can" "if" "who" "more" "when" "said" "do" "what" "about" "its" "so" "up"
+                                    "into" "no" "him" "some" "could" "them" "only" "time" "out" "my" "two" "other"
+                                    "then" "may" "over" "also" "new" "like" "these" "me" "after" "first" "your" "did"
+                                    "now" "any" "people" "than" "should" "very" "most" "see" "where" "just" "made"
+                                    "between" "back" "way" "many" "years" "being" "our" "how" "work"
+                                    ;; lisp-specific keywords
+                                    ,@(iter (for s in-package :cl external-only t)
+                                            (collecting (symbol-name s))))
+                                  :test #'string-equal))))
+              (result (and (< 2 (length words))
+                           (<= 0.1
+                               (/ count
+                                  (max 1 (length words)))))))
+         
+         (unless result
+           (note "String ~s does not look like a docstring." string))
+         result)))
 
 
-                         
+
 
 (defun parse-def (form &aux acc)
   (match form

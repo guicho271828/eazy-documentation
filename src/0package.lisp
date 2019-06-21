@@ -57,3 +57,13 @@ Advantages over the existing libraries:
   (let ((len (reduce #'max acc :key (alexandria:compose #'length #'symbol-name))))
     (dolist (s acc)
       (format t "~%~(~v@a : ~a~)" len s (princ-to-string (sb-kernel:%fun-lambda-list (macro-function s)))))))
+
+(defun note (format-string &rest args)
+  (fresh-line *error-output*)
+  (let ((*print-right-margin* 100)
+        (*print-pretty* t)
+        (*print-length* 100))
+    (pprint-logical-block (*error-output* nil :per-line-prefix "; ")
+      (apply #'format
+             *error-output*
+             format-string args))))
