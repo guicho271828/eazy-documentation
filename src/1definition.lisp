@@ -12,14 +12,19 @@
 )
 
 (defun definition= (a b)
-  "Compare the name, doctype, docstring by EQ. Returns true when they look same.
-
-Docstring are compared because the same function could be recognized multiple
-times when a macro expands into another macro (e.g. defrule -> defun).
-In such a case, the docstring objects are most likely the same object (by EQ)."
+  "Compare the name and the doctype. Returns true when they are all EQ."
   (match* (a b)
-    (((definition :doctype (place d1) :name (place n1) :docstring (place s1) :file f1)
-      (definition :doctype (place d2) :name (place n2) :docstring (place s2) :file f2))
+    (((definition :doctype d1 :name n1)
+      (definition :doctype d2 :name n2))
+     (and (eq d1 d2)
+          (eq n1 n2)))))
+
+(defun definition~ (a b)
+  "Compare the name, doctype, docstring by EQ.
+ Returns true when they look same according to a heuristic rule."
+  (match* (a b)
+    (((definition :doctype d1 :name n1 :file f1 :docstring (place s1))
+      (definition :doctype d2 :name n2 :file f2 :docstring (place s2)))
      (let* ((name    (eq n1 n2))
             (doctype (eq d1 d2))
             (file    (equal f1 f2))
@@ -29,23 +34,7 @@ In such a case, the docstring objects are most likely the same object (by EQ)."
        (and file
             (or (and name (or (not s1) (not s2) string))
                 (and doctype s1 s2 string)
-                (and name doctype string)))
-
-       ;; wrong attempts
-       #+(or)
-       (<= 2 (count t (vector 
-                       (set-equal (ignore-errors s1)
-                                  (ignore-errors s2))
-                       (equal (ignore-errors d1)
-                              (ignore-errors d2)))))
-       #+(or)
-       (and (eq (ignore-errors n1)
-                (ignore-errors n2))
-            (or 
-             (eq (ignore-errors s1)
-                 (ignore-errors s2))
-             (eq (ignore-errors d1)
-                 (ignore-errors d2))))))))
+                (and name doctype string)))))))
 
 (defun left (a b) (declare (ignore b)) a)
 
