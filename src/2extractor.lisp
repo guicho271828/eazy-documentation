@@ -69,12 +69,14 @@
              (ematch (ensure-list name-and-options)
                ((list 'setf (type symbol))
                 (setf (getf acc :name) name-and-options))
-               ((list* (and name (type symbol)) options)
-                (setf (getf acc :name) name)))
+               ((list* (and name (type symbol)) _)
+                (setf (getf acc :name) name))
+               ((list* (and name (type string)) _)
+                (setf (getf acc :name) (intern (string-upcase name) :keyword))))
 
              (setf (getf acc :args) args)
 
-             (multiple-value-bind (body decl docstring) (parse-body maybe-body :documentation t)
+             (multiple-value-bind (body decl docstring) (parse-body body :documentation t)
                (declare (ignore body decl))
                (when (stringp docstring)
                  (setf (getf acc :docstring) docstring))))))
@@ -82,21 +84,28 @@
          (_
           
           (match rest
-            ((list* name-and-options args body)
+            ((list* name-and-options rest2)
              
              (ematch (ensure-list name-and-options)
                ((list 'setf (type symbol))
                 (setf (getf acc :name) name-and-options))
-               ((list* (and name (type symbol)) options)
-                (setf (getf acc :name) name)))))
+               ((list* (and name (type symbol)) _)
+                (setf (getf acc :name) name))
+               ((list* (and name (type string)) _)
+                (setf (getf acc :name) (intern (string-upcase name) :keyword))))
 
-          (when-let ((it (find-if #'stringp rest)))
-            (setf (getf acc :docstring) it))
+             (when-let ((it (find-if #'stringp rest2)))
+               (setf (getf acc :docstring) it))))
+
+          
 
           ;; defgeneric / defclass / defpackage-style documentation
-          (match (member :documentation (flatten form))
-            ((list* :documentation (and docstring (type string)) _)
-             (setf (getf acc :docstring) docstring))))))
+          ;; defsystem
+          (labels ((rec (list)
+                     (match list
+                       ((list* (or :description :documentation) (and docstring (type string)) _)
+                        (setf (getf acc :docstring) docstring)))))
+            (rec (flatten form))))))
      
      (apply #'add-definition acc))))
 
