@@ -26,40 +26,30 @@
          (mapc #'funcall *deferred-tasks*))
        *defs*))))
 
-(defun generate-commondoc-from-file (file &rest args &key (title "(no title)") (whitelist nil) (blacklist '(:asdf)))
-  (declare (ignorable title whitelist blacklist))
+;; This is not a magic: +keywords+ is a list, and I am just inserting it in the
+;; read time
+
+(defun generate-commondoc-from-file (file &rest args &key . #.+keywords+)
+  #.+ignore+
   (apply #'generate-commondoc
          (extract-definitions-from-file file)
          args))
 
-(defun generate-commondoc-from-system (system &rest args &key (title "(no title)") (whitelist nil) (blacklist '(:asdf)))
-  (declare (ignorable title whitelist blacklist))
+(defun generate-commondoc-from-system (system &rest args &key . #.+keywords+)
+  #.+ignore+
   (apply #'generate-commondoc
          (extract-definitions-from-system system)
          args))
 
-
-(defun generate-html-from-file (file pathname &rest args
-                                &key
-                                  (title "(no title)")
-                                  (toc t)
-                                  (whitelist nil)
-                                  (blacklist '(:asdf))
-                                  (max-depth 2))
-  (declare (ignorable title toc whitelist blacklist max-depth))
+(defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
+  #.+ignore+
   (apply #'generate-html
          (extract-definitions-from-file file)
          pathname
          args))
 
-(defun generate-html-from-system (system pathname &rest args
-                                  &key
-                                    (title "(no title)")
-                                    (toc t)
-                                    (whitelist nil)
-                                    (blacklist '(:asdf))
-                                    (max-depth 2))
-  (declare (ignorable title toc whitelist blacklist max-depth))
+(defun generate-html-from-system (system pathname &rest args &key . #.+keywords+)
+  #.+ignore+
   (apply #'generate-html
          (extract-definitions-from-system system)
          pathname

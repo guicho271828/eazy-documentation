@@ -1,13 +1,15 @@
 (in-package :eazy-documentation)
 
-(defun generate-html (defs pathname &rest rest
-                      &key
-                        (title "(no title)")
-                        (toc t)
-                        (whitelist nil)
-                        (blacklist '(:asdf))
-                        (max-depth 2))
-  (declare (ignorable title toc whitelist blacklist max-depth))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar +keywords+ '((title "(no title)")
+                       (toc t)
+                       (whitelist nil)
+                       (blacklist '(:asdf))
+                       (max-depth 2)))
+  (defvar +ignore+ '(declare (ignorable title toc whitelist blacklist max-depth))))
+
+(defun generate-html (defs pathname &rest rest &key . #.+keywords+)
+  #.+ignore+
   (let ((node (apply #'generate-commondoc defs :allow-other-keys t rest)))
     (ensure-directories-exist pathname)
     (if (member (pathname-type pathname)
@@ -22,13 +24,7 @@
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
-(defun generate-commondoc (defs
-                           &key
-                             (title "(no title)")
-                             (toc t)
-                             (whitelist nil)
-                             (blacklist '(:asdf))
-                             (max-depth 2))
+(defun generate-commondoc (defs &key . #.+keywords+)
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
 
