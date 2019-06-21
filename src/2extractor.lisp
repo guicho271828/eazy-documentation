@@ -103,8 +103,9 @@
           ;; defsystem
           (labels ((rec (list)
                      (match list
-                       ((list* (or :description :documentation) (and docstring (type string)) _)
-                        (setf (getf acc :docstring) docstring)))))
+                       ((list* (or :description :documentation) docstring _)
+                        (when (stringp docstring)
+                          (setf (getf acc :docstring) docstring))))))
             (rec (flatten form))))))
      
      (apply #'add-def acc))))
