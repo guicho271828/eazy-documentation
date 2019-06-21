@@ -22,9 +22,14 @@
 
 (defun expand-extracting-document (expander form env)
   (handler-case (extract-document form)
-    (error ()
-      (let ((*print-length* 4))
-        (format *error-output* "~%; failed parsing ~a" form))))
+    (error (c)
+      (fresh-line *error-output*)
+      (let ((*print-right-margin* 100)
+            (*print-length* 4)
+            (*print-pretty* t))
+        (pprint-logical-block (*error-output* nil :per-line-prefix "; ")
+          (format *error-output*
+                  "~&Failed parsing ~a due to ~a" form (type-of c))))))
   (funcall *old-macroexpand-hook* expander form env))
 
 (defun extract-document (form)

@@ -53,7 +53,15 @@ In such a case, the docstring objects are most likely the same object (by EQ)."
   (when (slot-boundp from slot)
     (if (slot-boundp to slot)
         (progn
-          (simple-style-warning "overwriting ~a for ~a/~a" slot (doctype to) (name to))
+          (fresh-line *error-output*)
+          (let ((*print-right-margin* 100)
+                (*print-pretty* t)
+                (*print-length* 100))
+            (pprint-logical-block (*error-output* nil :per-line-prefix "; ")
+              (format *error-output*
+                      "~&Overwriting ~a for (~a ~a ...) :~:_ ~a~:_ ->~:_ ~a" slot (doctype to) (name to)
+                      (ignore-errors (slot-value to slot))
+                      (ignore-errors (slot-value from slot)))))
           (setf (slot-value to slot) (funcall fn (slot-value to slot) (slot-value from slot))))
         (setf (slot-value to slot) (slot-value from slot)))))
 
