@@ -40,45 +40,58 @@
   (match form
     ((list* macro rest)
      (setf (getf acc :doctype) macro)
-     
-     (match (sb-kernel:%fun-lambda-list (macro-function macro))
-       ((list _ (type list) '&body _)
-        ;; defun, defmacro, deftype and others
-        
-        (match rest
-          ((list* name-and-options args body)
-           
-           (ematch (ensure-list name-and-options)
-             ((list 'setf (type symbol))
-              (setf (getf acc :name) name-and-options))
-             ((list* (and name (type symbol)) options)
-              (setf (getf acc :name) name)))
 
-           (setf (getf acc :args) args)
+     (let ((lambda-list (sb-kernel:%fun-lambda-list (macro-function macro))))
+       (labels ((rec (list)
+                  (match list
+                    ((list* '&whole _ rest)
+                     (rec rest))
+                    ((list* '&environment _ rest)
+                     (rec rest))
+                    ((cons else rest)
+                     (cons else (rec rest))))))
+         (setf lambda-list
+               (rec lambda-list)))
+       
+       
+       (match lambda-list
+         ((list* _ (type list) '&body _ _)
+          ;; defun, defmacro, deftype and others
+          
+          (match rest
+            ((list* name-and-options args body)
+             
+             (ematch (ensure-list name-and-options)
+               ((list 'setf (type symbol))
+                (setf (getf acc :name) name-and-options))
+               ((list* (and name (type symbol)) options)
+                (setf (getf acc :name) name)))
 
-           (multiple-value-bind (body decl docstring) (parse-body maybe-body :documentation t)
-             (declare (ignore body decl))
-             (when (stringp docstring)
-               (setf (getf acc :docstring) docstring))))))
+             (setf (getf acc :args) args)
 
-       (_
-        
-        (match rest
-          ((list* name-and-options args body)
-           
-           (ematch (ensure-list name-and-options)
-             ((list 'setf (type symbol))
-              (setf (getf acc :name) name-and-options))
-             ((list* (and name (type symbol)) options)
-              (setf (getf acc :name) name)))))
+             (multiple-value-bind (body decl docstring) (parse-body maybe-body :documentation t)
+               (declare (ignore body decl))
+               (when (stringp docstring)
+                 (setf (getf acc :docstring) docstring))))))
 
-        (when-let ((it (find-if #'stringp rest)))
-          (setf (getf acc :docstring) it))
+         (_
+          
+          (match rest
+            ((list* name-and-options args body)
+             
+             (ematch (ensure-list name-and-options)
+               ((list 'setf (type symbol))
+                (setf (getf acc :name) name-and-options))
+               ((list* (and name (type symbol)) options)
+                (setf (getf acc :name) name)))))
 
-        ;; defgeneric / defclass / defpackage-style documentation
-        (match (member :documentation (flatten form))
-          ((list* :documentation (and docstring (type string)) _)
-           (setf (getf acc :docstring) docstring)))))
+          (when-let ((it (find-if #'stringp rest)))
+            (setf (getf acc :docstring) it))
+
+          ;; defgeneric / defclass / defpackage-style documentation
+          (match (member :documentation (flatten form))
+            ((list* :documentation (and docstring (type string)) _)
+             (setf (getf acc :docstring) docstring))))))
      
      (apply #'add-definition acc))))
 
@@ -121,7 +134,8 @@
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-document
      (lambda ()
-       (asdf:compile-system system)
+       (asdf:clear-system system)
+       (asdf:compile-system system :force t)
        (when *deferred-tasks*
          (asdf:load-system system)
          (mapc #'funcall *deferred-tasks*))
