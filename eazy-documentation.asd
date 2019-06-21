@@ -13,6 +13,8 @@
  :depends-on (:trivia
               :alexandria
               :iterate
+              :cl-ppcre
+              :trivia.ppcre
               :common-doc
               :common-html
               :common-doc-split-paragraphs)
