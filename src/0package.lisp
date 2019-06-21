@@ -19,7 +19,7 @@ NUMCL.  If not, see <http://www.gnu.org/licenses/>.
 |#
 
 (defpackage :eazy-documentation
-  (:use :cl :alexandria :trivia)
+  (:use :cl :alexandria :trivia :iterate :common-doc)
   (:documentation
    "
 This package provides an easy-pezy way to extract documentations from
