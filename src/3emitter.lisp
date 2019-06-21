@@ -89,7 +89,7 @@
                                   (pathname-directory pfile))))
              (push
               (make-section (make-text
-                             (namestring (make-pathname :name nil :type nil :defaults pfile))
+                             (lastcar (pathname-directory pfile))
                              :metadata (plist-hash-table '("html:class" "directory")))
                             :children (reverse tmp-dir-sections))
               tmp-sections)
@@ -112,7 +112,7 @@
          (when tmp-dir-sections
            (push
             (make-section (make-text
-                           (namestring (make-pathname :name nil :type nil :defaults pfile))
+                           (lastcar (pathname-directory pfile))
                            :metadata (plist-hash-table '("html:class" "directory")))
                           :children (reverse tmp-dir-sections))
             tmp-sections))
