@@ -139,8 +139,13 @@
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-document
      (lambda ()
-       (asdf:clear-system system)
-       (asdf:compile-system system :force t)
+       (with-compilation-unit ()
+         (let ((*compile-print* nil)
+               (*compile-verbose* nil))
+           (let ((*package* (find-package :asdf)))
+             (compile-file (asdf:system-source-file system) :output-file p))
+           (asdf:clear-system system)
+           (asdf:compile-system system :verbose nil :force t)))
        (when *deferred-tasks*
          (asdf:load-system system)
          (mapc #'funcall *deferred-tasks*))
