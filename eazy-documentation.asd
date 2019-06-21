@@ -17,12 +17,14 @@
               :trivia.ppcre
               :common-doc
               :common-html
-              :common-doc-split-paragraphs)
+              :common-doc-split-paragraphs
+              :cl-who)
  :pathname "src/"
  :serial t
  :components ((:file "0package")
               (:file "1definition")
               (:file "2extractor")
               (:file "3emitter")
-              (:file "4user"))
+              (:file "4user")
+              (:file "5template"))
  :description "Heuristic documentation extraction library")
