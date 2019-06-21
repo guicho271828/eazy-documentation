@@ -27,7 +27,8 @@
                                :if-exists :supersede
                                :if-does-not-exist :create)
               (write-string (common-html.toc:multi-file-toc node :max-depth max-depth) s)))
-          (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))))
+          (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
+    pathname))
 
 (defun generate-commondoc (defs
                            &key
