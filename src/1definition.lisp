@@ -31,20 +31,20 @@
             (s1 (ignore-errors s1))
             (s2 (ignore-errors s2))
             (string (equal s1 s2)))
-       (and file
-            (or
-             ;; same doctype; different name, missing docs
-             (values (and doctype (not s1) (not s2))
-                     :missing-docs)
-             ;; different name; same doctype and string
-             (values (and doctype s1 s2 string)
-                     :shared-docstring)
-             ;; different doctype; same name, and string is missing in either one
-             ;; if they are bothe present, then they should be equal
-             (values (and name (or (and s1 (not s2))
-                                   (and (not s1) s2)
-                                   string))
-                     :same-name)))))))
+       (when file
+         (cond
+           ;; same doctype; different name, missing docs
+           ((and doctype (not s1) (not s2))
+            (values t :missing-docs))
+           ;; different name; same doctype and string
+           ((and doctype s1 s2 string)
+            (values t :shared-docstring))
+           ;; different doctype; same name, and string is missing in either one
+           ;; if they are bothe present, then they should be equal
+           ((and name (or (and s1 (not s2))
+                          (and (not s1) s2)
+                          string))
+            (values t :same-name))))))))
 
 (defun left (a b) (declare (ignore b)) a)
 
