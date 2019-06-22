@@ -18,6 +18,7 @@
                              (css-list *default-css*)
                              (js-list  *default-js*)
                              (external-only t)
+                             (clean nil)
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
   (defparameter +ignore+ `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))))
@@ -28,10 +29,10 @@
                  :type (pathname-type src)
                  :directory (pathname-directory dir)))
 
-(defun copy-to-dir (src dir)
+(defun copy-to-dir (src dir &optional force)
   (let ((dst (copy-destination src dir)))
-    (unless (probe-file dst)
-      (copy-file src dst))))
+    (ignore-errors
+      (copy-file src dst :if-to-exists (if force :supersede :error)))))
 
 (defun basename (pathname)
   (make-pathname :name (pathname-name pathname)
@@ -51,7 +52,7 @@
                        :js-list (mapcar #'basename js-list)
                        :allow-other-keys t args)))
           (dolist (src (append css-list js-list))
-            (copy-to-dir src directory))
+            (copy-to-dir src directory clean))
           (with-open-file (s pathname
                              :direction :output
                              :if-exists :supersede
@@ -65,7 +66,7 @@
                        :js-list (mapcar #'basename js-list)
                        :allow-other-keys t args)))
           (dolist (src (append css-list js-list))
-            (copy-to-dir src directory))
+            (copy-to-dir src directory clean))
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
