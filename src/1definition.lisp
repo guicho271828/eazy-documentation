@@ -45,12 +45,16 @@
        (when file
          ;; (break "~@{~a ~}" a b)
          (cond
+           ;; different name, but same docstring, args, package
            ((and doctype
+                 (eq (symbol-package n1) ; same package
+                     (symbol-package n2))
                  (or (and s1 s2 string)
                      (and (not s1) (not s2)))
                  (or (and a1 a2 args)
                      (and (not a1) (not a2))))
             (values t :same-doctype))
+           ;; different doctype, but same docstring, args
            ((and name
                  (or (and s1 s2 string)
                      (and (not s1) (not s2)))
