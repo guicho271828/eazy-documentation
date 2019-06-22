@@ -27,15 +27,12 @@ h1, h2, h3, h4, h5, h6 {
   color: gray;
   margin-left: 0.1em; }
 
-.file {
-  font-style: italic; }
-  .file:before {
-    content: "File";
-    color: gray;
-    margin-right: 0.3em; }
+.file:before {
+  content: "File";
+  color: gray;
+  margin-right: 0.3em; }
 
 .extension {
-  font-style: italic;
   color: gray; }
   .extension:before {
     content: "."; }

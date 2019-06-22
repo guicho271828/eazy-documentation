@@ -45,7 +45,6 @@ div.entry {
 }
 
 .file {
-    font-style: italic;
     &:before {
         content: "File";
         color: gray;
@@ -57,7 +56,6 @@ div.entry {
     &:before {
         content: ".";
     }
-    font-style: italic;
     color: gray;
 }
 
