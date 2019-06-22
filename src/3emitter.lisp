@@ -1,5 +1,10 @@
 (in-package :eazy-documentation)
 
+;; https://fonts.googleapis.com/css?family=Comfortaa|Raleway
+(defparameter *default-fonts*
+  (list "Comfortaa" "Raleway")
+  "A list of strings for Google font name")
+
 (defparameter *default-css*
   (list (asdf:system-relative-pathname :eazy-documentation "default/css/default.css"))
   "A list of CSS stylesheet pathnames to be loaded in the html by default.")
@@ -17,6 +22,7 @@
                              (template-class 'eazy-template)
                              (css-list *default-css*)
                              (js-list  *default-js*)
+                             (font-list  *default-fonts*)
                              (external-only t)
                              (clean nil)
                              &allow-other-keys)
