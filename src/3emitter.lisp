@@ -139,22 +139,22 @@
              (when (not (equal file pfile))
                (push
                 (make-section (make-content
-                               (list (make-text
-                                      (ignore-errors (pathname-name pfile))
-                                      :metadata (classes "file"))
-                                     (make-text
-                                      (ignore-errors (pathname-type pfile))
-                                      :metadata (classes "extension"))))
-                              :children
-                              (if pfile
-                                  (list* (make-web-link
+                               (list* (make-text
+                                       (ignore-errors (pathname-name pfile))
+                                       :metadata (classes "file"))
+                                      (make-text
+                                       (ignore-errors (pathname-type pfile))
+                                       :metadata (classes "extension"))
+                                      (when pfile
+                                        (list
+                                         (make-web-link
                                           ;; TODO : github link
                                           ;; note: uiop:enough-pathname
                                           (format nil "file://~a" (namestring pfile))
                                           (list (span "[source]"))
-                                          :metadata (classes "source-link"))
-                                         (reverse tmp-file-sections))
-                                  (reverse tmp-file-sections)))
+                                          :metadata (classes "source-link"))))))
+                              :children
+                              (reverse tmp-file-sections))
                 tmp-dir-sections)
                (setf tmp-file-sections nil))
              

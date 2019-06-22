@@ -17,6 +17,11 @@ html {
 h1,h2,h3,h4,h5,h6 {
     margin-top: 0.7em;
     margin-bottom: 0.3em;
+    word-break:break-all;
+    .source-link {
+        float: right;
+        font-size: smaller;
+    }
 }
 
 .main {
@@ -59,47 +64,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 
-
-/* .main { */
-/*     width: 37em; */
-/*     max-width: 37em; */
-/*     margin-left: 24em; */
-/* } */
-/*  */
-/* .toc { */
-/*     width: 24em; */
-/*     max-width: 24em; */
-/*     word-break:break-all; */
-/* } */
-/*  */
-/*  */
-/* @media all and (min-width: 64.4em) { */
-/*     body { */
-/*         .main { */
-/*             display: inline-block; */
-/*             vertical-align: top; */
-/*         } */
-/*         .toc { */
-/*             display: inline-block; */
-/*             vertical-align: top; */
-/*         } */
-/*     } */
-/* } */
-/*  */
-/* @media all and (max-width: 64.4em) { */
-/*     body { */
-/*         text-align: center; */
-/*         .main { */
-/*             text-align: left; */
-/*         } */
-/*         .toc { */
-/*             text-align: left; */
-/*         } */
-/*     } */
-/* } */
-
-
-
+////////////////////////////////////////////////////////////////
 
 /* markup */
 
