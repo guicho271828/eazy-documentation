@@ -34,6 +34,9 @@ h1, h2, h3, h4, h5, h6 {
 .main {
   margin: 0.5em 1em 1em 1em;
   padding: 1em; }
+  .main img {
+    display: inline-block;
+    max-width: 100%; }
 
 /* zoom out */
 @media all and (min-width: 64.4em) {

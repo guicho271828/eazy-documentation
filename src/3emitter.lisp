@@ -301,7 +301,11 @@
                   (par docstring "docstring")
                   (par "(documentation missing)" "docstring" "missing"))))
               ;; process the static file
-              (par (docstring def) "docstring"))
+              (make-content
+               (list
+                (make-instance
+                 'common-html.emitter:raw-text-node ; see 1raw-html.lisp
+                 :text (docstring def)))))
           :metadata (classes "entry")))))))
 
 (defun table-of-contents (doc-or-node &key max-depth)

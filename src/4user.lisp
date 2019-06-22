@@ -10,7 +10,7 @@
          (mapc #'funcall *deferred-tasks*))
        *defs*))))
 
-(defun extract-definitions-from-system (system &rest args &key . #.+keywords+)
+(defun extract-definitions-from-system (system &key . #.+keywords+)
   #.+ignore+
   (when (not static-files)
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
@@ -24,7 +24,10 @@
          (add-def :name nil
                   :doctype 'static-file
                   :file file
-                  :docstring (read-file-into-string file)))
+                  :docstring
+                  (uiop:with-temporary-file (:pathname p :type "html")
+                    (uiop:run-program (format nil "pandoc -o ~a ~a" p file))
+                    (read-file-into-string p))))
        (with-compilation-unit ()
          (let ((*compile-print* nil)
                (*compile-verbose* nil))
