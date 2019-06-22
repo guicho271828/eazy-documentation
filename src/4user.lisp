@@ -61,7 +61,7 @@
          pathname
          args))
 
-(defun generate-html-from-system (system pathname &rest args &key . #.+keywords+)
+(defun generate-html-from-system (system pathname &rest args &key loop . #.+keywords+)
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
@@ -73,7 +73,11 @@
       (when (search "https://github.com/" hp)
         (setf (getf args :remote-root)
               (format nil "~a/blob/master" hp)))))
-  (apply #'generate-html
-         (extract-definitions-from-system system)
-         pathname
-         args))
+  (let ((defs (extract-definitions-from-system system)))
+    (if loop
+        (loop
+           (apply #'generate-html defs pathname args)
+           (break))
+        (apply #'generate-html defs pathname args))))
+
+
