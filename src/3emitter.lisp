@@ -144,7 +144,16 @@
                                      (make-text
                                       (ignore-errors (pathname-type pfile))
                                       :metadata (classes "extension"))))
-                              :children (reverse tmp-file-sections))
+                              :children
+                              (if pfile
+                                  (list* (make-web-link
+                                          ;; TODO : github link
+                                          ;; note: uiop:enough-pathname
+                                          (format nil "file://~a" (namestring pfile))
+                                          (list (span "[source]"))
+                                          :metadata (classes "source-link"))
+                                         (reverse tmp-file-sections))
+                                  (reverse tmp-file-sections)))
                 tmp-dir-sections)
                (setf tmp-file-sections nil))
              
