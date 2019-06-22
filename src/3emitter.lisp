@@ -55,21 +55,23 @@
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
-(defun generate-commondoc (defs &key . #.+keywords+)
+(defun process-black-white-list (defs blacklist whitelist)
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
+  (delete-if
+   (lambda (def)
+     (ematch def
+       ((class def name)
+        ;; skip if the name is in the blacklist
+        (or (some (curry #'find-symbol (symbol-name name)) blacklist)
+            (and whitelist
+                 ;; skip if the name is not in the whitelist, if provided
+                 (notany (curry #'find-symbol (symbol-name name)) whitelist))))))
+   defs))
 
-  (setf defs
-        (delete-if
-         (lambda (def)
-           (ematch def
-             ((class def name)
-              ;; skip if the name is in the blacklist
-              (or (some (curry #'find-symbol (symbol-name name)) blacklist)
-                  (and whitelist
-                       ;; skip if the name is not in the whitelist, if provided
-                       (notany (curry #'find-symbol (symbol-name name)) whitelist))))))
-         defs))
+(defun generate-commondoc (defs &key . #.+keywords+)
+  #.+ignore+
+  (setf defs (process-black-white-list defs blacklist whitelist))
   
   (iter (for def in-vector defs)
         (for pdef previous def)
