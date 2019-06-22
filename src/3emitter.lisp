@@ -234,10 +234,12 @@
          (ensure-list element-or-elements)
          args))
 
+(defun optional-list (&rest args) (remove nil args))
+
 (defun make-section-from-similar-defs (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (ecase mode
-      (:missing-docs
+      (:same-doctype
        (div
         (make-section
          (div
@@ -249,21 +251,12 @@
                            (span "," "sep2")))
                        (collecting
                          (span-id (down (name def)) "name" (down (doctype def)))))))
-         :children (list (par "(documentation missing)" "docstring" "missing")))
-        :metadata (classes "entry")))
-      (:shared-docstring
-       (div
-        (make-section
-         (div
-          (list* (span (down (doctype (first defs))) "doctype")
-                 (span ":" "sep1")
-                 (iter (for def in defs)
-                       (unless (first-iteration-p)
-                         (collecting
-                           (span "," "sep2")))
-                       (collecting
-                         (span-id (down (name def)) "name" (down (doctype def)))))))
-         :children (list (par (docstring (first defs)) "docstring")))
+         :children (optional-list
+                    (ignore-errors
+                      (down (princ-to-string (args (first defs)))))
+                    (if-let ((doc (ignore-errors (docstring (first defs)))))
+                      (par doc "docstring")
+                      (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
       (:same-name
        (div
@@ -277,14 +270,12 @@
                       (span (down (doctype def)) "doctype")))
               ,(span ":" "sep1")
               ,(span-id (down (name (first defs))) "name")))
-         :children
-         (list
-          (iter (for def in defs)
-                (for docstring = (ignore-errors (docstring def)))
-                (when docstring
-                  (leave (par docstring "docstring")))
-                (finally
-                 (return (par "(documentation missing)" "docstring" "missing"))))))
+         :children (optional-list
+                    (ignore-errors
+                      (down (princ-to-string (args (first defs)))))
+                    (if-let ((doc (ignore-errors (docstring (first defs)))))
+                      (par doc "docstring")
+                      (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
       ((nil)
        (assert (= 1 (length defs)))
