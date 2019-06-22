@@ -82,7 +82,7 @@
                   (make-text "Index")
                   :children
                   (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
-                 :metadata (classes "toc"))
+                 :metadata (classes "table-of-contents"))
             (children doc)))
     (push (make-section
            (make-text title)

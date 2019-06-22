@@ -12,24 +12,111 @@ html {
     padding: 0;
 }
 
+/* layout */
+
 h1,h2,h3,h4,h5,h6 {
     margin-top: 0.7em;
     margin-bottom: 0.3em;
 }
 
-div.entry {
-    span.name {
+.main {
+    width: 37em;
+    max-width: 37em;
+    margin: 1em 1em 1em 1em;
+}
+
+.table-of-contents {
+    width: 25em;
+    max-width: 25em;
+    word-break:break-all;
+    margin: 1em 1em 1em 1em;
+}
+
+
+@media all and (min-width: 64.4em) {
+    body {
+        .main {
+            display: inline-block;
+            vertical-align: top;
+        }
+        .table-of-contents {
+            display: inline-block;
+            vertical-align: top;
+        }
     }
 }
 
-.missing {
-    color: lightgray;
-    font-style: italic;
+@media all and (max-width: 64.4em) {
+    body {
+        text-align: center;
+        .main {
+            text-align: left;
+        }
+        .table-of-contents {
+            text-align: left;
+        }
+    }
 }
 
-.docstring {
-    margin-left: 1em;
+
+
+/* .main { */
+/*     width: 37em; */
+/*     max-width: 37em; */
+/*     margin-left: 24em; */
+/* } */
+/*  */
+/* .toc { */
+/*     width: 24em; */
+/*     max-width: 24em; */
+/*     word-break:break-all; */
+/* } */
+/*  */
+/*  */
+/* @media all and (min-width: 64.4em) { */
+/*     body { */
+/*         .main { */
+/*             display: inline-block; */
+/*             vertical-align: top; */
+/*         } */
+/*         .toc { */
+/*             display: inline-block; */
+/*             vertical-align: top; */
+/*         } */
+/*     } */
+/* } */
+/*  */
+/* @media all and (max-width: 64.4em) { */
+/*     body { */
+/*         text-align: center; */
+/*         .main { */
+/*             text-align: left; */
+/*         } */
+/*         .toc { */
+/*             text-align: left; */
+/*         } */
+/*     } */
+/* } */
+
+
+
+
+/* markup */
+
+.main {
+    .missing {
+        color: lightgray;
+        font-style: italic;
+    }
+
+    .docstring {
+        margin-left: 1em;
+    }
 }
+
+.toc {
+}
+
 
 .directory {
     &:before {
@@ -71,48 +158,9 @@ a {
     text-decoration: none;
 }    
 
-
 .toc {
     .directory, .file, .extension, .directory:before, .directory:after, .file:before {
         font-style: inherit;
         color: inherit;
     }
-}
-
-
-@media all and (min-width: 64.4em) {
-    /* header.logotype { */
-    /*     position: fixed; */
-    /*     top: 0em; */
-    /*     left: 2.4em; */
-    /*     text-align: left; */
-    /* } */
-    /* aside.meta { */
-    /*     width: 13.2em; */
-    /*     position: fixed; */
-    /*     top: 7.2em; */
-    /*     left: 3em; */
-    /*     text-align: left; */
-    /* } */
-    /* aside.footer { */
-    /*     width: 13.2em; */
-    /*     position: fixed; */
-    /*     top: 9em; */
-    /*     left: 3em; */
-    /*     text-align: left; */
-    /* } */
-    /* aside.meta span:after { */
-    /*     content:"\a"; */
-    /*     white-space: pre; */
-    /* } */
-    /* body { */
-    /*     margin-left: 24em; */
-    /* } */
-}
-
-@media all and (max-width: 30em) {
-    /* aside.meta span:after { */
-    /*     content:"\a"; */
-    /*     white-space: pre; */
-    /* } */
 }
