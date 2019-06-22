@@ -69,10 +69,29 @@
                  (notany (curry #'find-symbol (symbol-name name)) whitelist))))))
    defs))
 
-(defun generate-commondoc (defs &key . #.+keywords+)
+(defun generate-commondoc (defs &rest args &key . #.+keywords+)
   #.+ignore+
   (setf defs (process-black-white-list defs blacklist whitelist))
-  
+  (let ((doc (make-document title)))
+    (push
+     (apply #'generate-commondoc-main defs args) 
+     (children doc))
+    (when toc
+      (common-doc.ops:fill-unique-refs doc)
+      (push (div (make-section
+                  (make-text "Index")
+                  :children
+                  (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
+                 :metadata (classes "toc"))
+            (children doc)))
+    (push (make-section
+           (make-text title)
+           :metadata (classes "title"))
+          (children doc))
+    doc))
+
+(defun generate-commondoc-main (defs &key . #.+keywords+)
+  #.+ignore+
   (iter (for def in-vector defs)
         (for pdef previous def)
         (with tmp-defs = nil)
@@ -146,17 +165,7 @@
                           :children (reverse tmp-dir-sections))
             tmp-sections))
 
-         (let* ((main (div (reverse tmp-sections) :metadata (classes "main")))
-                (doc (make-document title :children (list main))))
-           (when toc
-             (common-doc.ops:fill-unique-refs doc)
-             (push (div (make-section
-                         (make-text "Index")
-                         :children
-                         (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
-                        :metadata (classes "toc"))
-                   (children doc)))
-           (return doc)))))
+         (return (div (reverse tmp-sections) :metadata (classes "main"))))))
 
 (defun classes (&rest classes)
   (plist-hash-table
