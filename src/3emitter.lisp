@@ -14,7 +14,7 @@
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defparameter +keywords+ '((title "(no title)")
+  (defparameter +keywords+ '((title "(no title)" title-given-p)
                              (toc t)
                              (whitelist nil)
                              (blacklist '())
@@ -27,7 +27,9 @@
                              (clean nil)
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
-  (defparameter +ignore+ `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))))
+  (defparameter +ignore+
+    `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))
+                         ,@(remove nil (mapcar #'third (butlast +keywords+)))))
     "Declare statement that says ignorable for the keyword arguments in +keywords+."))
 
 (defun copy-destination (src dir)
