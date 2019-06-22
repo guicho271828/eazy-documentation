@@ -102,7 +102,7 @@
                (push
                 (make-section (make-text
                                (pathname-name pfile)
-                               :metadata (plist-hash-table '("html:class" "file")))
+                               :metadata (classes "file"))
                               :children (reverse tmp-file-sections))
                 tmp-dir-sections)
                (setf tmp-file-sections nil))
@@ -113,7 +113,7 @@
                (push
                 (make-section (make-text
                                (lastcar (pathname-directory pfile))
-                               :metadata (plist-hash-table '("html:class" "directory")))
+                               :metadata (classes "directory"))
                               :children (reverse tmp-dir-sections))
                 tmp-sections)
                (setf tmp-dir-sections nil)))))
@@ -129,14 +129,14 @@
            (push
             (make-section (make-text
                            (pathname-name pfile)
-                           :metadata (plist-hash-table '("html:class" "file")))
+                           :metadata (classes "file"))
                           :children (reverse tmp-file-sections))
             tmp-dir-sections))
          (when tmp-dir-sections
            (push
             (make-section (make-text
                            (lastcar (pathname-directory pfile))
-                           :metadata (plist-hash-table '("html:class" "directory")))
+                           :metadata (classes "directory"))
                           :children (reverse tmp-dir-sections))
             tmp-sections))
 
@@ -146,55 +146,69 @@
              (push (make-section
                     (make-text "Index")
                     :children
-                    (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
+                    (list (common-doc.ops:table-of-contents doc :max-depth max-depth))
+                    :metadata (classes "toc"))
                    (children doc)))
            (return doc)))))
 
+(defun classes (&rest classes)
+  (plist-hash-table
+   `("html:class" ,(format nil "~{~a~^,~}" classes))))
+
 (defun span (string &rest classes)
   (make-text (string string)
-             :metadata
-             (plist-hash-table
-              `("html:class" ,(format nil "~{~a~^,~}" classes)))))
+             :metadata (apply #'classes classes)))
 
-
+(defun par (string &rest classes)
+  (make-content (list (make-text (string string)))
+                :metadata (apply #'classes classes)))
 
 (defun make-section-from-similar-defs (defs mode)
   (ecase mode
     (:missing-docs
-     (make-paragraph
-      `(,(span (doctype (first-elt defs)) "doctype")
-         ,@(iter (for def in defs)
-                 (collecting
-                   (span (name def) "name" (doctype def))))
-         ,(span "(documentation missing)" "docstring-missing"))))
+     (make-section
+      (make-content
+       (list* (span (string-downcase (doctype (first-elt defs))) "doctype")
+              (iter (for def in defs)
+                    (collecting
+                      (span (name def) "name" (string-downcase (doctype def)))))))
+      :children (list (par "(documentation missing)" "docstring-missing"))
+      :metadata (classes "entry")))
     (:shared-docstring
-     (make-paragraph
-      `(,(span (doctype (first-elt defs)) "doctype")
-         ,@(iter (for def in defs)
-                 (collecting
-                   (span (name def) "name" (doctype def))))
-         ,(span (docstring (first-elt defs)) "docstring"))))
+     (make-section
+      (make-content
+       (list* (span (string-downcase (doctype (first-elt defs))) "doctype")
+              (iter (for def in defs)
+                    (collecting
+                      (span (name def) "name" (string-downcase (doctype def)))))))
+      :children (list (par (docstring (first-elt defs)) "docstring"))
+      :metadata (classes "entry")))
     (:same-name
-     (make-paragraph
-      `(,@(iter (for def in defs)
-                (collecting
-                  (span (doctype def) "doctype")))
-          ,(span (name (first-elt defs)) "name")
-          ,(span (iter (for def in defs)
-                       (for docstring = (ignore-errors (docstring def)))
-                       (finding docstring
-                                such-that docstring
-                                on-failure "(documentation missing)"))
-                 "docstring"))))
+     (make-section
+      (make-content
+       `(,@(iter (for def in defs)
+                 (collecting
+                   (span (string-downcase (doctype def)) "doctype")))
+           ,(span (name (first-elt defs)) "name")))
+      :children
+      (list
+       (iter (for def in defs)
+             (for docstring = (ignore-errors (docstring def)))
+             (when docstring
+               (leave (par docstring "docstring")))
+             (finally
+              (return (par "(documentation missing)" "docstring-missing")))))
+      :metadata (classes "entry")))
     ((nil)
      (assert (= 1 (length defs)))
-     (make-paragraph
-      (iter (for def in defs)
-            (collecting
-              (span (doctype def) "doctype"))
-            (collecting
-              (span (name def) "name"))
-            (collecting
-              (span (or (ignore-errors (docstring def))
-                        "(documentation missing)")
-                    "docstring")))))))
+     (let ((def (first defs)))
+       (make-section
+        (make-content
+         (list (span (string-downcase (doctype def)) "doctype")
+               (span (name def) "name")))
+        :children
+        (list
+         (if-let ((docstring (ignore-errors (docstring def))))
+           (par docstring "docstring")
+           (par "(documentation missing)" "docstring-missing")))
+        :metadata (classes "entry"))))))
