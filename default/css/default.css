@@ -1,14 +1,10 @@
-/* font, style */
+/* layout */
 html {
-  background: lightgray;
-  color: black;
-  font-family: "Raleway", sans-serif;
   font-weight: medium;
   line-height: 1.4;
   margin: 0 1.4em 0 1.4em;
   padding: 0; }
 
-/* layout */
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0.7em;
   margin-bottom: 0.3em;
@@ -17,65 +13,92 @@ h1, h2, h3, h4, h5, h6 {
     float: right;
     font-size: smaller; }
 
-.main {
-  background: white;
-  width: 40em;
-  margin: 1em 1em 1em 1em; }
+.title {
+  margin: 0.5em 0.5em 0.5em 0.5em;
+  padding: 0.5em; }
 
 .table-of-contents {
-  width: 17em;
   word-break: break-all;
-  margin: 1em 1em 1em 1em; }
+  margin: 0.5em 0.5em 0.5em 0.5em;
+  padding: 0.5em; }
   .table-of-contents .source-link {
     display: none; }
   .table-of-contents ol {
     padding-left: 1em; }
 
+.main {
+  margin: 0.5em 0.5em 0.5em 0.5em;
+  padding: 0.5em; }
+
+/* zoom out */
 @media all and (min-width: 64.4em) {
-  body {
-    text-align: left; }
-    body .main {
-      display: inline-block;
-      vertical-align: top;
-      text-align: left; }
-    body .table-of-contents {
-      display: inline-block;
-      vertical-align: top;
-      text-align: left; } }
+  body .title {
+    position: fixed;
+    height: 5em;
+    width: 17em; }
+  body .table-of-contents {
+    position: fixed;
+    top: 8em;
+    height: 100%;
+    width: 17em; }
+  body .main {
+    position: absolute;
+    left: 21em;
+    width: 40em; } }
+/* zoom in */
 @media all and (max-width: 64.4em) {
   body {
     text-align: center; }
-    body .main {
-      display: block;
-      vertical-align: top;
-      text-align: left; }
-    body .table-of-contents {
-      display: block;
-      vertical-align: top;
-      text-align: left; } }
+    body .title, body .table-of-contents, body .main {
+      display: inline-block;
+      text-align: left;
+      float: center;
+      width: 40em; } }
 /* markup */
-.main .missing {
-  color: lightgray;
-  font-style: italic; }
-.main .docstring {
-  margin-left: 1em; }
+/* font, style */
+html {
+  background: black;
+  color: gray;
+  font-family: "Inconsolata"; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: orange;
+  font-family: "Raleway"; }
+
+a {
+  text-decoration: none;
+  color: palegreen; }
+
+.title {
+  background: #202020; }
+
+.main {
+  background: #202020; }
+  .main .missing {
+    color: #404040;
+    font-style: italic; }
+  .main .docstring {
+    margin-left: 1em; }
+
+.table-of-contents {
+  background: #202020; }
 
 .directory:before {
   content: "Directory";
-  color: gray;
+  color: #404040;
   margin-right: 0.3em; }
 .directory:after {
   content: "/";
-  color: gray;
+  color: #404040;
   margin-left: 0.1em; }
 
 .file:before {
   content: "File";
-  color: gray;
+  color: #404040;
   margin-right: 0.3em; }
 
 .extension {
-  color: gray; }
+  color: #404040; }
   .extension:before {
     content: "."; }
 
@@ -85,12 +108,5 @@ h1, h2, h3, h4, h5, h6 {
 .sep2 {
   margin-left: 0.1em;
   margin-right: 0.1em; }
-
-a {
-  text-decoration: none; }
-
-.toc .directory, .toc .file, .toc .extension, .toc .directory:before, .toc .directory:after, .toc .file:before {
-  font-style: inherit;
-  color: inherit; }
 
 /*# sourceMappingURL=default.css.map */

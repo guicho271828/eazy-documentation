@@ -1,24 +1,13 @@
-
 ////////////////////////////////////////////////////////////////
 
-/* font, style */
-
-$title-font: 'Comfortaa';
-$text-font: 'Raleway';
+/* layout */
 
 html {
-    background: lightgray;
-    color: black;
-    font-family: $text-font, sans-serif;
     font-weight: medium;
     line-height: 1.4;
     margin: 0 1.4em 0 1.4em;
     padding: 0;
 }
-
-////////////////////////////////////////////////////////////////
-
-/* layout */
 
 h1,h2,h3,h4,h5,h6 {
     margin-top: 0.7em;
@@ -30,16 +19,15 @@ h1,h2,h3,h4,h5,h6 {
     }
 }
 
-.main {
-    background: white;
-    width: 40em;
-    margin: 1em 1em 1em 1em;
+.title {
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    padding: 0.5em;
 }
 
 .table-of-contents {
-    width: 17em;
     word-break:break-all;
-    margin: 1em 1em 1em 1em;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    padding: 0.5em;
     .source-link {
         display: none;
     }
@@ -48,37 +36,44 @@ h1,h2,h3,h4,h5,h6 {
     }
 }
 
+.main {
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    padding: 0.5em;
+}
+
 $width: 64.4em;
 
-
+/* zoom out */
 @media all and (min-width: $width) {
     body {
-        text-align: left;
-        .main {
-            display: inline-block;
-            vertical-align: top;
-            text-align: left;
-        }
+        .title {
+            position: fixed;
+            height: 5em;
+            width: 17em;
+        }            
         .table-of-contents {
-            display: inline-block;
-            vertical-align: top;
-            text-align: left;
+            position: fixed;
+            top: 8em;
+            height: 100%;
+            width: 17em;
+        }
+        .main {
+            position: absolute;
+            left: 21em;
+            width: 40em;
         }
     }
 }
 
+/* zoom in */
 @media all and (max-width: $width) {
     body {
         text-align: center;
-        .main {
-            display: block;
-            vertical-align: top;
+        .title, .table-of-contents, .main {
+            display: inline-block;
             text-align: left;
-        }
-        .table-of-contents {
-            display: block;
-            vertical-align: top;
-            text-align: left;
+            float: center;
+            width: 40em;
         }
     }
 }
@@ -88,9 +83,49 @@ $width: 64.4em;
 
 /* markup */
 
+
+////////////////////////////////////////////////////////////////
+
+/* font, style */
+
+$title-font: 'Comfortaa';
+$text-font:  'Raleway';
+
+$title-font: 'Comfortaa';
+$text-font:  'Inconsolata';
+$title-font:  'Raleway';
+
+
+$background : black;
+$background2: #202020;
+$text       : gray;
+$highlight  : orange;
+$highlight2 : palegreen;
+$suppressed : #404040;
+
+html {
+    background: $background;
+    color: $text;
+    font-family: $text-font;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: $highlight;
+    font-family: $title-font;
+}
+
+a {
+    text-decoration: none;
+    color: $highlight2;
+}
+
+.title {
+    background: $background2;
+}
 .main {
+    background: $background2;
     .missing {
-        color: lightgray;
+        color: $suppressed;
         font-style: italic;
     }
 
@@ -99,19 +134,19 @@ $width: 64.4em;
     }
 }
 
-.toc {
+.table-of-contents {
+    background: $background2;
 }
-
 
 .directory {
     &:before {
         content: "Directory";
-        color: gray;
+        color: $suppressed;
         margin-right: 0.3em;
     }
     &:after {
         content: "/";
-        color: gray;
+        color: $suppressed;
         margin-left: 0.1em;
     }
 }
@@ -119,7 +154,7 @@ $width: 64.4em;
 .file {
     &:before {
         content: "File";
-        color: gray;
+        color: $suppressed;
         margin-right: 0.3em;
     }
 }
@@ -128,7 +163,7 @@ $width: 64.4em;
     &:before {
         content: ".";
     }
-    color: gray;
+    color: $suppressed;
 }
 
 .sep1 {
@@ -139,14 +174,4 @@ $width: 64.4em;
     margin-right: 0.1em;
 }
 
-a {
-    text-decoration: none;
-}    
-
-.toc {
-    .directory, .file, .extension, .directory:before, .directory:after, .file:before {
-        font-style: inherit;
-        color: inherit;
-    }
-}
 
