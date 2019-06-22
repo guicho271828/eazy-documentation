@@ -25,33 +25,43 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .main {
-    width: 37em;
-    max-width: 37em;
+    width: 40em;
+    max-width: 40em;
     margin: 1em 1em 1em 1em;
 }
 
 .table-of-contents {
-    width: 25em;
-    max-width: 25em;
+    width: 20em;
+    max-width: 20em;
     word-break:break-all;
     margin: 1em 1em 1em 1em;
+    .source-link {
+        display: none;
+    }
+    ol {
+        padding-left: 1em;
+    }
 }
 
+$width: 60em;
 
-@media all and (min-width: 64.4em) {
+@media all and (min-width: $width) {
     body {
+        text-align: center;
         .main {
             display: inline-block;
             vertical-align: top;
+            text-align: left;
         }
         .table-of-contents {
             display: inline-block;
             vertical-align: top;
+            text-align: left;
         }
     }
 }
 
-@media all and (max-width: 64.4em) {
+@media all and (max-width: $width) {
     body {
         text-align: center;
         .main {
@@ -129,3 +139,4 @@ a {
         color: inherit;
     }
 }
+

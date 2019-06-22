@@ -17,24 +17,32 @@ h1, h2, h3, h4, h5, h6 {
     font-size: smaller; }
 
 .main {
-  width: 37em;
-  max-width: 37em;
+  width: 40em;
+  max-width: 40em;
   margin: 1em 1em 1em 1em; }
 
 .table-of-contents {
-  width: 25em;
-  max-width: 25em;
+  width: 20em;
+  max-width: 20em;
   word-break: break-all;
   margin: 1em 1em 1em 1em; }
+  .table-of-contents .source-link {
+    display: none; }
+  .table-of-contents ol {
+    padding-left: 1em; }
 
-@media all and (min-width: 64.4em) {
-  body .main {
-    display: inline-block;
-    vertical-align: top; }
-  body .table-of-contents {
-    display: inline-block;
-    vertical-align: top; } }
-@media all and (max-width: 64.4em) {
+@media all and (min-width: 60em) {
+  body {
+    text-align: center; }
+    body .main {
+      display: inline-block;
+      vertical-align: top;
+      text-align: left; }
+    body .table-of-contents {
+      display: inline-block;
+      vertical-align: top;
+      text-align: left; } }
+@media all and (max-width: 60em) {
   body {
     text-align: center; }
     body .main {
