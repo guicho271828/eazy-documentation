@@ -237,7 +237,12 @@
 (defun list+ (&rest args) (remove nil (flatten args)))
 
 (defun print-args (def)
-  (format nil "~(~{~a~^ ~}~)" (args def)))
+  (ignore-errors
+    (make-code-block
+     "lisp"
+     (list (span (format nil "~(~{~a~^ ~}~)" (args def))))
+     :metadata (classes "args"))))
+
 
 (defun make-section-from-similar-defs (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
@@ -254,8 +259,7 @@
                            (span "," "sep2")))
                        (collecting
                          (span-id (down (name def)) "name" (down (doctype def)))))
-                 (ignore-errors
-                   (span (print-args (first defs)) "args"))))
+                 (print-args (first defs))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
@@ -272,8 +276,7 @@
                  (collecting (span (down (doctype def)) "doctype")))
            (span ":" "sep1")
            (span-id (down (name (first defs))) "name")
-           (ignore-errors
-             (span (print-args (first defs)) "args")))
+           (print-args (first defs)))
          :children (optional-list
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
@@ -289,8 +292,7 @@
              (span (down (doctype def)) "doctype")
              (span ":" "sep1")
              (span-id (down (name def)) "name")
-             (ignore-errors
-               (span (print-args (first defs)) "args"))))
+             (print-args def)))
            :children
            (list+
             (if-let ((docstring (ignore-errors (docstring def))))

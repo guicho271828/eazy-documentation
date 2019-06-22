@@ -112,8 +112,12 @@ a {
 .args {
   /* float : right; */
   /* margin-right: 3em; */
-  margin-left: 0.5em;
-  font-size: smaller;
+  margin-top: 0em;
+  margin-left: 3em;
+  font-size: 0.7em;
   color: palegreen; }
+
+pre {
+  margin: 0; }
 
 /*# sourceMappingURL=default.css.map */
