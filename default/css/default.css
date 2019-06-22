@@ -13,7 +13,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0.3em; }
   h1 .source-link, h2 .source-link, h3 .source-link, h4 .source-link, h5 .source-link, h6 .source-link {
     float: right;
-    font-size: smaller; }
+    font-size: small; }
 
 .title {
   margin: 0.5em 0.5em 0.5em 0.5em;
