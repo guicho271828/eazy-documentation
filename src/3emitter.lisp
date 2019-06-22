@@ -225,7 +225,7 @@
 
 (defun print-args (def)
   (ignore-errors
-    (span (let ((*print-pretty* nil))
+    (span (let ((*print-pretty* t) (*print-right-margin* 1000))
             (format nil "~(~{~a~^ ~}~)" (args def)))
           "args" "lisp")))
 
