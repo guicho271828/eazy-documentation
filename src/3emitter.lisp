@@ -17,6 +17,7 @@
                              (template-class 'eazy-template)
                              (css-list *default-css*)
                              (js-list  *default-js*)
+                             (external-only t)
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
   (defparameter +ignore+ `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))))
@@ -55,7 +56,7 @@
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
-(defun process-black-white-list (defs blacklist whitelist)
+(defun process-black-white-list (defs blacklist whitelist external-only)
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
   (delete-if
@@ -66,18 +67,28 @@
         (or (some (curry #'find-symbol (symbol-name name)) blacklist)
             (and whitelist
                  ;; skip if the name is not in the whitelist, if provided
-                 (notany (curry #'find-symbol (symbol-name name)) whitelist))))
+                 (notany (curry #'find-symbol (symbol-name name)) whitelist))
+            (when external-only
+              (or (null (symbol-package name)) ; for gensyms
+                  (not (eq :external
+                           (nth-value 1 (find-symbol (symbol-name name)
+                                                     (symbol-package name)))))))))
        ((class def name)
         ;; skip if the name is in the blacklist
         (or (some (curry #'find-symbol (symbol-name name)) blacklist)
             (and whitelist
                  ;; skip if the name is not in the whitelist, if provided
-                 (notany (curry #'find-symbol (symbol-name name)) whitelist))))))
+                 (notany (curry #'find-symbol (symbol-name name)) whitelist))
+            (when external-only
+              (or (null (symbol-package name))
+                  (not (eq :external
+                           (nth-value 1 (find-symbol (symbol-name name)
+                                                     (symbol-package name)))))))))))
    defs))
 
 (defun generate-commondoc (defs &rest args &key . #.+keywords+)
   #.+ignore+
-  (setf defs (process-black-white-list defs blacklist whitelist))
+  (setf defs (process-black-white-list defs blacklist whitelist external-only))
   (let ((doc (make-document title))
         (main (apply #'generate-commondoc-main defs args)))
     (push main (children doc))
