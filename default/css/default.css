@@ -16,6 +16,8 @@ h1, h2, h3, h4, h5, h6 {
 .title {
   margin: 0.5em 0.5em 0.5em 0.5em;
   padding: 0.5em; }
+  .title h1 {
+    margin: 0em; }
 
 .table-of-contents {
   word-break: break-all;
