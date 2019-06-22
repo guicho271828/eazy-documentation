@@ -158,29 +158,20 @@ a {
     font-style: italic;
     color: gray; }
 
-.args {
-  margin-top: 0em;
-  margin-left: 3em;
-  font-size: 0.7em;
-  color: orange;
-  display: block;
-  font-family: "Ubuntu"; }
-  .args:before {
-    content: "Args:";
-    margin-right: 0.3em;
-    font-style: italic;
-    color: gray; }
-
-code {
-  color: magenta;
-  background: #333333;
-  border-color: gray;
-  border-width: 1px;
-  border-style: dashed;
-  border-radius: 5px;
-  padding: 3px; }
-  code a {
-    color: inherit; }
+/* .args { */
+/*     &:before { */
+/*         content: "Args:"; */
+/*         margin-right: 0.3em; */
+/*         font-style: italic; */
+/*         color: $text; */
+/*     } */
+/*     margin-top: 0em; */
+/*     margin-left: 3em; */
+/*     font-size: 0.7em; */
+/*     /\* color: $highlight; *\/ */
+/*     display: block; */
+/*     font-family: $mono-font; */
+/* } */
 
 pre {
   color: magenta;

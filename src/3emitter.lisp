@@ -272,9 +272,11 @@
 
 (defun print-args (def)
   (ignore-errors
-    (make-code-block
-     "lisp"
-     (list (span (let ((*print-pretty* nil)) (format nil "~(~{~a~^ ~}~)" (args def))))))))
+    (make-code
+     (list (span (let ((*print-pretty* t) (*print-right-margin* 1000))
+                   (format nil "~(~{~a~^ ~}~)" (args def)))))
+     :metadata (classes "lisp" "args"))))
+
 
 
 (defun print-package (def)

@@ -241,9 +241,9 @@ a {
     margin-right: 1em;
 }
 
-.args {
+code.args {
     &:before {
-        content: "Args:";
+        content: "Args:" !important;
         margin-right: 0.3em;
         font-style: italic;
         color: $text;
@@ -251,7 +251,6 @@ a {
     margin-top: 0em;
     margin-left: 3em;
     font-size: 0.7em;
-    color: $highlight;
     display: block;
     font-family: $mono-font;
 }
