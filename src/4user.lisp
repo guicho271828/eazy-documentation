@@ -21,8 +21,8 @@
     (call-with-extracting-definitions
      (lambda ()
        (dolist (file static-files)
-         (add-def :name (make-keyword (pathname-name file))
-                  :doctype (pathname-type file)
+         (add-def :name nil
+                  :doctype 'static-file
                   :file file
                   :docstring (read-file-into-string file)))
        (with-compilation-unit ()

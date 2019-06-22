@@ -286,19 +286,22 @@
        (assert (= 1 (length defs)))
        (let ((def (first defs)))
          (div
-          (make-section
-           (div
-            (list+
-             (span (down (doctype def)) "doctype")
-             (span ":" "sep1")
-             (span-id (down (name def)) "name")
-             (print-package def)
-             (print-args def)))
-           :children
-           (list+
-            (if-let ((docstring (ignore-errors (docstring def))))
-              (par docstring "docstring")
-              (par "(documentation missing)" "docstring" "missing"))))
+          (if (not (eq 'static-file (doctype def))) 
+              (make-section
+               (div
+                (list+
+                 (span (down (doctype def)) "doctype")
+                 (span ":" "sep1")
+                 (span-id (down (name def)) "name")
+                 (print-package def)
+                 (print-args def)))
+               :children
+               (list+
+                (if-let ((docstring (ignore-errors (docstring def))))
+                  (par docstring "docstring")
+                  (par "(documentation missing)" "docstring" "missing"))))
+              ;; process the static file
+              (par (docstring def) "docstring"))
           :metadata (classes "entry")))))))
 
 (defun table-of-contents (doc-or-node &key max-depth)
