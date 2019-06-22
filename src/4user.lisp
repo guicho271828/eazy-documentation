@@ -26,7 +26,10 @@
                   :file file
                   :docstring
                   (uiop:with-temporary-file (:pathname p :type "html")
-                    (uiop:run-program (format nil "pandoc -o ~a ~a" p file))
+                    (uiop:run-program
+                     (format nil "pandoc -o ~a ~a" p file))
+                    (uiop:run-program
+                     (format nil "sed -i 's@~a@~a@g' ~a" local-root remote-root p))
                     (read-file-into-string p))))
        (with-compilation-unit ()
          (let ((*compile-print* nil)

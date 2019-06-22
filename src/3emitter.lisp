@@ -117,6 +117,11 @@
           (children doc))
     doc))
 
+(defun remote-pathname (file local-root remote-root)
+  (format nil "~a/~a"
+          remote-root
+          (uiop:enough-pathname file local-root)))
+
 (defun generate-commondoc-main (defs &key . #.+keywords+)
   #.+ignore+
   (iter (for def in-vector defs)
@@ -159,9 +164,7 @@
                                       (when pfile
                                         (if (and remote-root local-root)
                                             (make-web-link
-                                             (format nil "~a/~a"
-                                                     remote-root
-                                                     (uiop:enough-pathname pfile local-root))
+                                             (remote-pathname pfile local-root remote-root)
                                              (list (span "[edit on web]"))
                                              :metadata (classes "source-link"))
                                             (make-web-link
