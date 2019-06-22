@@ -72,16 +72,15 @@
 (defun generate-commondoc (defs &rest args &key . #.+keywords+)
   #.+ignore+
   (setf defs (process-black-white-list defs blacklist whitelist))
-  (let ((doc (make-document title)))
-    (push
-     (apply #'generate-commondoc-main defs args) 
-     (children doc))
+  (let ((doc (make-document title))
+        (main (apply #'generate-commondoc-main defs args)))
+    (push main (children doc))
     (when toc
       (common-doc.ops:fill-unique-refs doc)
       (push (div (make-section
                   (make-text "Index")
                   :children
-                  (list (common-doc.ops:table-of-contents doc :max-depth max-depth)))
+                  (list (table-of-contents main :max-depth max-depth)))
                  :metadata (classes "table-of-contents"))
             (children doc)))
     (push (make-section
@@ -251,3 +250,39 @@
               (par docstring "docstring")
               (par "(documentation missing)" "docstring" "missing"))))
           :metadata (classes "entry")))))))
+
+(defun table-of-contents (doc-or-node &key max-depth)
+  "Extract a tree of document links representing the table of contents of a
+document. All the sections in the document must have references, so you should
+call fill-unique-refs first.
+
+Completely rewritten from common-html because it infers the depth incorrectly.
+"
+  (labels ((ol (list)
+             (make-ordered-list
+              (iter (for child in (remove nil list))
+                    (collecting
+                      (make-list-item (ensure-list child))))))
+           (rec (node depth)
+             #+(or) (format t "~% ~v@a ~a" depth :rec node)
+             (match node
+               ((section title children)
+                (make-content 
+                 (list* (make-document-link nil (reference node) (list title))
+                        (when (< depth max-depth)
+                          (ensure-list
+                           (ol
+                            (iter (for child in children)
+                                  (appending
+                                      (ensure-list (rec child (1+ depth)))))))))))
+               ((content-node children)
+                (iter (for child in children)
+                      (appending
+                          (ensure-list (rec child depth)))))
+               ((document children)
+                (iter (for child in children)
+                      (appending
+                          (ensure-list (rec child depth))))))))
+    (ol (ensure-list (rec doc-or-node 1)))))
+
+
