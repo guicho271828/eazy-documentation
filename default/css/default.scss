@@ -26,13 +26,11 @@ h1,h2,h3,h4,h5,h6 {
 
 .main {
     width: 40em;
-    max-width: 40em;
     margin: 1em 1em 1em 1em;
 }
 
 .table-of-contents {
-    width: 20em;
-    max-width: 20em;
+    width: 17em;
     word-break:break-all;
     margin: 1em 1em 1em 1em;
     .source-link {
@@ -43,11 +41,12 @@ h1,h2,h3,h4,h5,h6 {
     }
 }
 
-$width: 60em;
+$width: 64.4em;
+
 
 @media all and (min-width: $width) {
     body {
-        text-align: center;
+        text-align: left;
         .main {
             display: inline-block;
             vertical-align: top;
@@ -65,9 +64,13 @@ $width: 60em;
     body {
         text-align: center;
         .main {
+            display: block;
+            vertical-align: top;
             text-align: left;
         }
         .table-of-contents {
+            display: block;
+            vertical-align: top;
             text-align: left;
         }
     }

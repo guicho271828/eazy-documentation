@@ -18,12 +18,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .main {
   width: 40em;
-  max-width: 40em;
   margin: 1em 1em 1em 1em; }
 
 .table-of-contents {
-  width: 20em;
-  max-width: 20em;
+  width: 17em;
   word-break: break-all;
   margin: 1em 1em 1em 1em; }
   .table-of-contents .source-link {
@@ -31,9 +29,9 @@ h1, h2, h3, h4, h5, h6 {
   .table-of-contents ol {
     padding-left: 1em; }
 
-@media all and (min-width: 60em) {
+@media all and (min-width: 64.4em) {
   body {
-    text-align: center; }
+    text-align: left; }
     body .main {
       display: inline-block;
       vertical-align: top;
@@ -42,12 +40,16 @@ h1, h2, h3, h4, h5, h6 {
       display: inline-block;
       vertical-align: top;
       text-align: left; } }
-@media all and (max-width: 60em) {
+@media all and (max-width: 64.4em) {
   body {
     text-align: center; }
     body .main {
+      display: block;
+      vertical-align: top;
       text-align: left; }
     body .table-of-contents {
+      display: block;
+      vertical-align: top;
       text-align: left; } }
 /* markup */
 .main .missing {
