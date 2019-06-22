@@ -121,9 +121,8 @@
                   (list (table-of-contents main :max-depth max-depth)))
                  :metadata (classes "table-of-contents"))
             (children doc)))
-    (push (make-section
-           (make-text title)
-           :metadata (classes "title"))
+    (push (div (make-section (make-text title))
+               :metadata (classes "title"))
           (children doc))
     doc))
 
