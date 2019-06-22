@@ -25,7 +25,7 @@
           (cl-who:htm
            (:script :type "text/javascript" :src js)))
         (:script :type "text/javascript"
-                 "window.onload = function(){HighlightLisp.highlight_auto({className: 'lisp'});};")
+                 "window.onload=function(){HighlightLisp.highlight_auto(); console.log(\"ok\");};")
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body
@@ -48,7 +48,7 @@
           (cl-who:htm
            (:script :type "text/javascript" :src js)))
         (:script :type "text/javascript"
-                 "window.onload = function(){HighlightLisp.highlight_auto({className: 'lisp'});};")
+                 "window.onload=function(){HighlightLisp.highlight_auto(); console.log(\"ok\");};")
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body

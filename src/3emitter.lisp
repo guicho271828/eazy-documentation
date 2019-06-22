@@ -272,9 +272,10 @@
 
 (defun print-args (def)
   (ignore-errors
-    (span (let ((*print-pretty* t) (*print-right-margin* 1000))
-            (format nil "~(~{~a~^ ~}~)" (args def)))
-          "args" "lisp")))
+    (make-code-block
+     "lisp"
+     (list (span (let ((*print-pretty* nil)) (format nil "~(~{~a~^ ~}~)" (args def))))))))
+
 
 (defun print-package (def)
   (flet ((down (x) (string-downcase (princ-to-string x))))
