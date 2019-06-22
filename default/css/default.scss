@@ -91,9 +91,9 @@ $width: 64.4em;
 $title-font: 'Comfortaa';
 $text-font:  'Raleway';
 
-$title-font: 'Comfortaa';
-$text-font:  'Inconsolata';
+$text-font:   'Inconsolata';
 $title-font:  'Raleway';
+$mono-font:   'Ubuntu';
 
 
 $background : black;
@@ -206,6 +206,8 @@ a {
     margin-left: 3em;
     font-size: 0.7em;
     color: $highlight;
+    display: block;
+    font-family: $mono-font;
 }
 
 pre {

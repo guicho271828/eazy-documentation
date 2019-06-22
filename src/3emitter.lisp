@@ -2,7 +2,7 @@
 
 ;; https://fonts.googleapis.com/css?family=Comfortaa|Raleway
 (defparameter *default-fonts*
-  (list "Comfortaa" "Raleway")
+  (list "Comfortaa" "Raleway" "Ubuntu")
   "A list of strings for Google font name")
 
 (defparameter *default-css*

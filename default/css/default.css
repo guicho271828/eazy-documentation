@@ -129,7 +129,9 @@ a {
   margin-top: 0em;
   margin-left: 3em;
   font-size: 0.7em;
-  color: orange; }
+  color: orange;
+  display: block;
+  font-family: "Ubuntu"; }
   .args:before {
     content: "Args:";
     margin-right: 0.3em;
