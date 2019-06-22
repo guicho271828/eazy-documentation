@@ -12,7 +12,7 @@
   (defparameter +keywords+ '((title "(no title)")
                              (toc t)
                              (whitelist nil)
-                             (blacklist '(:asdf))
+                             (blacklist '())
                              (max-depth 2)
                              (template-class 'eazy-template)
                              (css-list *default-css*)
