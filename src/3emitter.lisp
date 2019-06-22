@@ -269,7 +269,7 @@
            (span-id (down (name (first defs))) "name")
            (print-package (first defs))
            (print-args (first defs)))
-         :children (optional-list
+         :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
                       (par "(documentation missing)" "docstring" "missing")))))
