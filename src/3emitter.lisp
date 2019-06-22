@@ -234,7 +234,7 @@
          (ensure-list element-or-elements)
          args))
 
-(defun optional-list (&rest args) (remove nil args))
+(defun list+ (&rest args) (remove nil (flatten args)))
 
 (defun make-section-from-similar-defs (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
@@ -243,17 +243,17 @@
        (div
         (make-section
          (div
-          (list* (span (down (doctype (first defs))) "doctype")
+          (list+ (span (down (doctype (first defs))) "doctype")
                  (span ":" "sep1")
                  (iter (for def in defs)
                        (unless (first-iteration-p)
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span-id (down (name def)) "name" (down (doctype def)))))))
-         :children (optional-list
-                    (ignore-errors
-                      (span (down (princ-to-string (args (first defs)))) "args"))
+                         (span-id (down (name def)) "name" (down (doctype def)))))
+                 (ignore-errors
+                   (span (down (princ-to-string (args (first defs)))) "args"))))
+         :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
@@ -262,20 +262,19 @@
        (div
         (make-section
          (div
-          `(,@(iter (for def in defs)
-                    (unless (first-iteration-p)
-                      (collecting
-                        (span "," "sep2")))
-                    (collecting
-                      (span (down (doctype def)) "doctype")))
-              ,(span ":" "sep1")
-              ,(span-id (down (name (first defs))) "name")))
+          (list+
+           (iter (for def in defs)
+                 (unless (first-iteration-p)
+                   (collecting (span "," "sep2")))
+                 (collecting (span (down (doctype def)) "doctype")))
+           (span ":" "sep1")
+           (span-id (down (name (first defs))) "name")
+           (ignore-errors
+             (span (down (princ-to-string (args (first defs)))) "args")))
          :children (optional-list
-                    (ignore-errors
-                      (span (down (princ-to-string (args (first defs)))) "args"))
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
-                      (par "(documentation missing)" "docstring" "missing"))))
+                      (par "(documentation missing)" "docstring" "missing")))))
         :metadata (classes "entry")))
       ((nil)
        (assert (= 1 (length defs)))
@@ -283,13 +282,14 @@
          (div
           (make-section
            (div
-            (list (span (down (doctype def)) "doctype")
-                  (span ":" "sep1")
-                  (span-id (down (name def)) "name")))
+            (list+
+             (span (down (doctype def)) "doctype")
+             (span ":" "sep1")
+             (span-id (down (name def)) "name")
+             (ignore-errors
+               (span (down (princ-to-string (args (first defs)))) "args"))))
            :children
-           (optional-list
-            (ignore-errors
-              (span (down (princ-to-string (args (first defs)))) "args"))
+           (list+
             (if-let ((docstring (ignore-errors (docstring def))))
               (par docstring "docstring")
               (par "(documentation missing)" "docstring" "missing"))))
