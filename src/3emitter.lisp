@@ -225,10 +225,9 @@
 
 (defun print-args (def)
   (ignore-errors
-    (make-code-block
-     "lisp"
-     (list (span (format nil "~(~{~a~^ ~}~)" (args def))))
-     :metadata (classes "args"))))
+    (span (let ((*print-pretty* nil))
+            (format nil "~(~{~a~^ ~}~)" (args def)))
+          "args" "lisp")))
 
 (defun print-package (def)
   (flet ((down (x) (string-downcase (princ-to-string x))))
