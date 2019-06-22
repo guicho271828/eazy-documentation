@@ -166,21 +166,46 @@ a {
     color: $suppressed;
 }
 
+
+.doctype {
+    color: $suppressed;
+    color: $text;
+}
+
 .sep1 {
     margin-right: 0.3em;
+    color: $text;
 }
 .sep2 {
     margin-left : 0.1em;
     margin-right: 0.1em;
 }
 
+
+.package {
+    &:before {
+        content: "Package:";
+        margin-right: 0.3em;
+        font-style: italic;
+        color: $text;
+    }
+    font-size: 0.7em;
+    color: $highlight2;
+    float : right;
+    margin-right: 1em;
+}
+
 .args {
-    /* float : right; */
-    /* margin-right: 3em; */
+    &:before {
+        content: "Args:";
+        margin-right: 0.3em;
+        font-style: italic;
+        color: $text;
+    }
     margin-top: 0em;
     margin-left: 3em;
     font-size: 0.7em;
-    color: $highlight2;
+    color: $highlight;
 }
 
 pre {
