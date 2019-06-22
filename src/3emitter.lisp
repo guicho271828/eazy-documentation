@@ -253,7 +253,7 @@
                          (span-id (down (name def)) "name" (down (doctype def)))))))
          :children (optional-list
                     (ignore-errors
-                      (down (princ-to-string (args (first defs)))))
+                      (span (down (princ-to-string (args (first defs)))) "args"))
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
@@ -272,7 +272,7 @@
               ,(span-id (down (name (first defs))) "name")))
          :children (optional-list
                     (ignore-errors
-                      (down (princ-to-string (args (first defs)))))
+                      (span (down (princ-to-string (args (first defs)))) "args"))
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
@@ -287,7 +287,9 @@
                   (span ":" "sep1")
                   (span-id (down (name def)) "name")))
            :children
-           (list
+           (optional-list
+            (ignore-errors
+              (span (down (princ-to-string (args (first defs)))) "args"))
             (if-let ((docstring (ignore-errors (docstring def))))
               (par docstring "docstring")
               (par "(documentation missing)" "docstring" "missing"))))

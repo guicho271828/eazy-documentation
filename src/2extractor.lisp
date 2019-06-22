@@ -87,7 +87,7 @@
        
        
        (match lambda-list
-         ((list* _ (type list) '&body _ _)
+         ((list* _ _ '&body _ _)
           ;; defun, defmacro, deftype and others
           
           (match rest
@@ -101,12 +101,28 @@
                ((list* (and name (type string)) _)
                 (setf (getf acc :name) (intern (string-upcase name) :keyword))))
 
-             (setf (getf acc :args) args)
+             (when (listp args)
+               (setf (getf acc :args) args))
+
+             (when-let ((it (find-if #'natural-language-string-p body)))
+               (setf (getf acc :docstring) it))
 
              (multiple-value-bind (body decl docstring) (parse-body body :documentation t)
                (declare (ignore body decl))
                (when (natural-language-string-p docstring)
-                 (setf (getf acc :docstring) docstring))))))
+                 (setf (getf acc :docstring) docstring)))
+             
+             ;; defgeneric / defclass / defpackage-style documentation
+             ;; defsystem
+             (labels ((rec (list)
+                        (match list
+                          ((list* (or :description :documentation) docstring rest)
+                           (when (natural-language-string-p docstring)
+                             (setf (getf acc :docstring) docstring))
+                           (rec rest))
+                          ((list* _ rest)
+                           (rec rest)))))
+               (rec (flatten form))))))
 
          (_
           
@@ -123,8 +139,6 @@
 
              (when-let ((it (find-if #'natural-language-string-p rest2)))
                (setf (getf acc :docstring) it))))
-
-          
 
           ;; defgeneric / defclass / defpackage-style documentation
           ;; defsystem
