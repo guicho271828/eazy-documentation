@@ -91,6 +91,7 @@
   (setf defs (process-black-white-list defs blacklist whitelist external-only))
   (let ((doc (make-document title))
         (main (apply #'generate-commondoc-main defs args)))
+    (common-doc.split-paragraphs:split-paragraphs main)
     (push main (children doc))
     (when toc
       (common-doc.ops:fill-unique-refs doc)
