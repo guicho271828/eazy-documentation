@@ -9,7 +9,13 @@
      (file      :accessor      file :initarg :file      :type pathname
                 :initform (or *compile-file-pathname* *load-pathname*)))
     (:documentation "Instances represententing a documentation entry."))
-  )
+
+  (defun safe-name (def)
+    (match (name def)
+      ((list 'setf name)
+       name)
+      (name
+       name))))
 
 (defmethod print-object ((def def) s)
   (print-unreadable-object (def s)
@@ -22,8 +28,8 @@
 (defun def= (a b)
   "Compare the name and the doctype. Returns true when they are all EQ."
   (ematch* (a b)
-    (((def :doctype d1 :name n1)
-      (def :doctype d2 :name n2))
+    (((def :doctype d1 :safe-name n1)
+      (def :doctype d2 :safe-name n2))
      (and (eq d1 d2)
           (eq n1 n2)))))
 
@@ -31,8 +37,8 @@
   "Compare the name, doctype, docstring by EQ.
  Returns true when they look same according to a heuristic rule."
   (ematch* (a b)
-    (((def :doctype d1 :name n1 :file f1 :docstring (place s1) :args (place a1))
-      (def :doctype d2 :name n2 :file f2 :docstring (place s2) :args (place a2)))
+    (((def :doctype d1 :safe-name n1 :file f1 :docstring (place s1) :args (place a1))
+      (def :doctype d2 :safe-name n2 :file f2 :docstring (place s2) :args (place a2)))
      (let ((name    (eq n1 n2))
            (doctype (eq d1 d2))
            (file    (equal f1 f2))

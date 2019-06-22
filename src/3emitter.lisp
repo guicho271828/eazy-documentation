@@ -81,29 +81,16 @@
   (setf whitelist (mapcar #'find-package whitelist))
   (delete-if
    (lambda (def)
-     (ematch def
-       ((class def :name (list 'setf name))
-        ;; skip if the name is in the blacklist
-        (or (some (curry #'find-symbol (symbol-name name)) blacklist)
-            (and whitelist
-                 ;; skip if the name is not in the whitelist, if provided
-                 (notany (curry #'find-symbol (symbol-name name)) whitelist))
-            (when external-only
-              (or (null (symbol-package name)) ; for gensyms
-                  (not (eq :external
-                           (nth-value 1 (find-symbol (symbol-name name)
-                                                     (symbol-package name)))))))))
-       ((class def name)
-        ;; skip if the name is in the blacklist
-        (or (some (curry #'find-symbol (symbol-name name)) blacklist)
-            (and whitelist
-                 ;; skip if the name is not in the whitelist, if provided
-                 (notany (curry #'find-symbol (symbol-name name)) whitelist))
-            (when external-only
-              (or (null (symbol-package name))
-                  (not (eq :external
-                           (nth-value 1 (find-symbol (symbol-name name)
-                                                     (symbol-package name)))))))))))
+     (let ((name (safe-name def)))
+       (or (some (curry #'find-symbol (symbol-name name)) blacklist)
+           (and whitelist
+                ;; skip if the name is not in the whitelist, if provided
+                (notany (curry #'find-symbol (symbol-name name)) whitelist))
+           (when external-only
+             (or (null (symbol-package name)) ; for gensyms
+                 (not (eq :external
+                          (nth-value 1 (find-symbol (symbol-name name)
+                                                    (symbol-package name))))))))))
    defs))
 
 (defun generate-commondoc (defs &rest args &key . #.+keywords+)
