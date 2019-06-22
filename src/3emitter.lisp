@@ -164,51 +164,65 @@
                 :metadata (apply #'classes classes)))
 
 (defun make-section-from-similar-defs (defs mode)
-  (ecase mode
-    (:missing-docs
-     (make-section
-      (make-content
-       (list* (span (string-downcase (doctype (first-elt defs))) "doctype")
-              (iter (for def in defs)
-                    (collecting
-                      (span (name def) "name" (string-downcase (doctype def)))))))
-      :children (list (par "(documentation missing)" "docstring-missing"))
-      :metadata (classes "entry")))
-    (:shared-docstring
-     (make-section
-      (make-content
-       (list* (span (string-downcase (doctype (first-elt defs))) "doctype")
-              (iter (for def in defs)
-                    (collecting
-                      (span (name def) "name" (string-downcase (doctype def)))))))
-      :children (list (par (docstring (first-elt defs)) "docstring"))
-      :metadata (classes "entry")))
-    (:same-name
-     (make-section
-      (make-content
-       `(,@(iter (for def in defs)
-                 (collecting
-                   (span (string-downcase (doctype def)) "doctype")))
-           ,(span (name (first-elt defs)) "name")))
-      :children
-      (list
-       (iter (for def in defs)
-             (for docstring = (ignore-errors (docstring def)))
-             (when docstring
-               (leave (par docstring "docstring")))
-             (finally
-              (return (par "(documentation missing)" "docstring-missing")))))
-      :metadata (classes "entry")))
-    ((nil)
-     (assert (= 1 (length defs)))
-     (let ((def (first defs)))
+  (flet ((down (x) (string-downcase x)))
+    (ecase mode
+      (:missing-docs
        (make-section
         (make-content
-         (list (span (string-downcase (doctype def)) "doctype")
-               (span (name def) "name")))
+         (list* (span (down (doctype (first defs))) "doctype")
+                (span ":" "sep")
+                (iter (for def in defs)
+                      (unless (first-iteration-p)
+                        (collecting
+                          (span "," "sep")))
+                      (collecting
+                        (span (down (name def)) "name" (down (doctype def)))))))
+        :children (list (par "(documentation missing)" "docstring-missing"))
+        :metadata (classes "entry")))
+      (:shared-docstring
+       (make-section
+        (make-content
+         (list* (span (down (doctype (first defs))) "doctype")
+                (span ":" "sep")
+                (iter (for def in defs)
+                      (unless (first-iteration-p)
+                        (collecting
+                          (span "," "sep")))
+                      (collecting
+                        (span (down (name def)) "name" (down (doctype def)))))))
+        :children (list (par (docstring (first defs)) "docstring"))
+        :metadata (classes "entry")))
+      (:same-name
+       (make-section
+        (make-content
+         `(,@(iter (for def in defs)
+                   (unless (first-iteration-p)
+                     (collecting
+                       (span "," "sep")))
+                   (collecting
+                     (span (down (doctype def)) "doctype")))
+             ,(span ":" "sep")
+             ,(span (down (name (first defs))) "name")))
         :children
         (list
-         (if-let ((docstring (ignore-errors (docstring def))))
-           (par docstring "docstring")
-           (par "(documentation missing)" "docstring-missing")))
-        :metadata (classes "entry"))))))
+         (iter (for def in defs)
+               (for docstring = (ignore-errors (docstring def)))
+               (when docstring
+                 (leave (par docstring "docstring")))
+               (finally
+                (return (par "(documentation missing)" "docstring-missing")))))
+        :metadata (classes "entry")))
+      ((nil)
+       (assert (= 1 (length defs)))
+       (let ((def (first defs)))
+         (make-section
+          (make-content
+           (list (span (down (doctype def)) "doctype")
+                 (span ":" "sep")
+                 (span (down (name def)) "name")))
+          :children
+          (list
+           (if-let ((docstring (ignore-errors (docstring def))))
+             (par docstring "docstring")
+             (par "(documentation missing)" "docstring-missing")))
+          :metadata (classes "entry")))))))
