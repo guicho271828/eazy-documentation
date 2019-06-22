@@ -61,6 +61,12 @@
   (delete-if
    (lambda (def)
      (ematch def
+       ((class def :name (list 'setf name))
+        ;; skip if the name is in the blacklist
+        (or (some (curry #'find-symbol (symbol-name name)) blacklist)
+            (and whitelist
+                 ;; skip if the name is not in the whitelist, if provided
+                 (notany (curry #'find-symbol (symbol-name name)) whitelist))))
        ((class def name)
         ;; skip if the name is in the blacklist
         (or (some (curry #'find-symbol (symbol-name name)) blacklist)
@@ -189,7 +195,7 @@
          args))
 
 (defun make-section-from-similar-defs (defs mode)
-  (flet ((down (x) (string-downcase x)))
+  (flet ((down (x) (string-downcase (princ-to-string x))))
     (ecase mode
       (:missing-docs
        (div
