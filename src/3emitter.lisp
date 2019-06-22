@@ -174,6 +174,11 @@
   (make-text (string string)
              :metadata (apply #'classes classes)))
 
+(defun span-id (string &rest classes)
+  (make-text (string string)
+             :metadata (apply #'classes classes)
+             :reference (string string)))
+
 (defun par (string &rest classes)
   (make-content (list (make-text (string string)))
                 :metadata (apply #'classes classes)))
@@ -197,7 +202,7 @@
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span (down (name def)) "name" (down (doctype def)))))))
+                         (span-id (down (name def)) "name" (down (doctype def)))))))
          :children (list (par "(documentation missing)" "docstring" "missing")))
         :metadata (classes "entry")))
       (:shared-docstring
@@ -211,7 +216,7 @@
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span (down (name def)) "name" (down (doctype def)))))))
+                         (span-id (down (name def)) "name" (down (doctype def)))))))
          :children (list (par (docstring (first defs)) "docstring")))
         :metadata (classes "entry")))
       (:same-name
@@ -225,7 +230,7 @@
                     (collecting
                       (span (down (doctype def)) "doctype")))
               ,(span ":" "sep1")
-              ,(span (down (name (first defs))) "name")))
+              ,(span-id (down (name (first defs))) "name")))
          :children
          (list
           (iter (for def in defs)
@@ -243,7 +248,7 @@
            (div
             (list (span (down (doctype def)) "doctype")
                   (span ":" "sep1")
-                  (span (down (name def)) "name")))
+                  (span-id (down (name def)) "name")))
            :children
            (list
             (if-let ((docstring (ignore-errors (docstring def))))
