@@ -110,6 +110,10 @@ a {
   margin-right: 0.1em; }
 
 .args {
-  float: right; }
+  /* float : right; */
+  /* margin-right: 3em; */
+  margin-left: 0.5em;
+  font-size: smaller;
+  color: palegreen; }
 
 /*# sourceMappingURL=default.css.map */
