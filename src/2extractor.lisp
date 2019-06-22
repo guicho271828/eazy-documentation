@@ -66,25 +66,26 @@
          result)))
 
 
-
+(defun remove-macro-lambda-list-keywords (lambda-list)
+  "remove &whole and &env from a lambda list"
+  (labels ((rec (list)
+             (match list
+               ((list* '&whole _ rest)
+                (rec rest))
+               ((list* '&environment _ rest)
+                (rec rest))
+               ((cons else rest)
+                (cons else (rec rest))))))
+    (rec lambda-list)))
 
 (defun parse-def (form &aux acc)
   (match form
     ((list* macro rest)
      (setf (getf acc :doctype) macro)
 
-     (let ((lambda-list (sb-kernel:%fun-lambda-list (macro-function macro))))
-       (labels ((rec (list)
-                  (match list
-                    ((list* '&whole _ rest)
-                     (rec rest))
-                    ((list* '&environment _ rest)
-                     (rec rest))
-                    ((cons else rest)
-                     (cons else (rec rest))))))
-         (setf lambda-list
-               (rec lambda-list)))
-       
+     (let ((lambda-list
+            (remove-macro-lambda-list-keywords
+             (sb-kernel:%fun-lambda-list (macro-function macro)))))
        
        (match lambda-list
          ((list* _ _ '&body _ _)
@@ -102,7 +103,8 @@
                 (setf (getf acc :name) (intern (string-upcase name) :keyword))))
 
              (when (listp args)
-               (setf (getf acc :args) args))
+               (setf (getf acc :args)
+                     (remove-macro-lambda-list-keywords args)))
 
              (when-let ((it (find-if #'natural-language-string-p body)))
                (setf (getf acc :docstring) it))
