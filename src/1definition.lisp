@@ -11,6 +11,14 @@
     (:documentation "Instances represententing a documentation entry."))
   )
 
+(defmethod print-object ((def def) s)
+  (print-unreadable-object (def s)
+    (ematch def
+      ((def :doctype d1 :name n1 :args (place a1))
+       (format s "~@{~s ~a~^ ~}" :doctype d1 :name n1)
+       (when (slot-boundp def 'args)
+         (format s "~@{~s~^ ~}" :args a1))))))
+
 (defun def= (a b)
   "Compare the name and the doctype. Returns true when they are all EQ."
   (ematch* (a b)
