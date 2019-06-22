@@ -275,11 +275,11 @@
            (span ":" "sep1")
            (span-id (down (name (first defs))) "name")
            (print-package (first defs))
-           (print-args (first defs)))
+           (print-args (first defs))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
-                      (par "(documentation missing)" "docstring" "missing")))))
+                      (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
       ((nil)
        (assert (= 1 (length defs)))
