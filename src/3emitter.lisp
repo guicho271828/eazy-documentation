@@ -23,36 +23,49 @@
   (defparameter +ignore+ `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))))
     "Declare statement that says ignorable for the keyword arguments in +keywords+."))
 
+(defun copy-destination (src dir)
+  (make-pathname :name (pathname-name src)
+                 :type (pathname-type src)
+                 :directory (pathname-directory dir)))
+
+(defun copy-to-dir (src dir)
+  (let ((dst (copy-destination src dir)))
+    (unless (probe-file dst)
+      (copy-file src dst))))
+
+(defun basename (pathname)
+  (make-pathname :name (pathname-name pathname)
+                 :type (pathname-type pathname)
+                 :directory nil))
+
 (defun generate-html (defs pathname &rest args &key . #.+keywords+)
   #.+ignore+
-  (let ((node (apply #'generate-commondoc defs args))
-        (common-html.template:*template*
-         (apply #'make-instance template-class :allow-other-keys t args)))
+  (let ((node (apply #'generate-commondoc defs args)))
     (ensure-directories-exist pathname)
     (if (member (pathname-type pathname) '("html" "htm") :test 'string-equal)
         ;; single file
-        (let ((directory (make-pathname :name nil :type nil :defaults pathname)))
+        (let* ((directory (make-pathname :name nil :type nil :defaults pathname))
+               (common-html.template:*template*
+                (apply #'make-instance template-class
+                       :css-list (mapcar #'basename css-list)
+                       :js-list (mapcar #'basename js-list)
+                       :allow-other-keys t args)))
           (dolist (src (append css-list js-list))
-            ;; don't copy if it already exists
-            (let ((dst (make-pathname :name (pathname-name src)
-                                      :type (pathname-type src)
-                                      :directory (pathname-directory directory))))
-              (unless (probe-file dst)
-                (copy-file src dst))))
+            (copy-to-dir src directory))
           (with-open-file (s pathname
                              :direction :output
                              :if-exists :supersede
                              :if-does-not-exist :create)
             (common-html.emitter:node-to-stream node s)))
         ;; multi file
-        (let ((directory (uiop:ensure-directory-pathname pathname)))
+        (let* ((directory (uiop:ensure-directory-pathname pathname))
+               (common-html.template:*template*
+                (apply #'make-instance template-class
+                       :css-list (mapcar #'basename css-list)
+                       :js-list (mapcar #'basename js-list)
+                       :allow-other-keys t args)))
           (dolist (src (append css-list js-list))
-            ;; don't copy if it already exists
-            (let ((dst (make-pathname :name (pathname-name src)
-                                      :type (pathname-type src)
-                                      :directory (pathname-directory directory))))
-              (unless (probe-file dst)
-                (copy-file src dst))))
+            (copy-to-dir src directory))
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
