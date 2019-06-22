@@ -41,6 +41,13 @@
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
+  (when (not local-root)
+    (setf (getf args :local-root)
+          (asdf:system-source-directory (asdf:find-system system))))
+  (when (not remote-root)
+    (let ((hp (asdf:system-homepage (asdf:find-system system))))
+      (when (search "https://github.com/" hp)
+        (format nil "~a/blob/master" hp))))
   (apply #'generate-commondoc
          (extract-definitions-from-system system)
          args))
@@ -58,6 +65,14 @@
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
+  (when (not local-root)
+    (setf (getf args :local-root)
+          (asdf:system-source-directory (asdf:find-system system))))
+  (when (not remote-root)
+    (let ((hp (asdf:system-homepage (asdf:find-system system))))
+      (when (search "https://github.com/" hp)
+        (setf (getf args :remote-root)
+              (format nil "~a/blob/master" hp)))))
   (apply #'generate-html
          (extract-definitions-from-system system)
          pathname

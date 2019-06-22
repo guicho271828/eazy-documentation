@@ -160,12 +160,10 @@
                                             (make-web-link
                                              (format nil "~a/~a"
                                                      remote-root
-                                                     (uiop:enough-pathname local-root pfile))
+                                                     (uiop:enough-pathname pfile local-root))
                                              (list (span "[edit on web]"))
                                              :metadata (classes "source-link"))
                                             (make-web-link
-                                             ;; TODO : github link
-                                             ;; note: uiop:enough-pathname
                                              (format nil "file://~a" (namestring pfile))
                                              (list (span "[source]"))
                                              :metadata (classes "source-link"))))))
