@@ -4,8 +4,8 @@
 (defvar *old-macroexpand-hook*)
 (defvar *deferred-tasks*)
 
-(defun add-def (&rest initargs &key doctype name args docstring)
-  (declare (ignore doctype name args docstring))
+(defun add-def (&rest initargs &key doctype name args docstring file)
+  (declare (ignore doctype name args docstring file))
   (let ((obj (apply #'make-instance 'def initargs)))
     (if-let ((it (find obj *defs* :test #'def=)))
       (progn

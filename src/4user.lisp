@@ -10,10 +10,21 @@
          (mapc #'funcall *deferred-tasks*))
        *defs*))))
 
-(defun extract-definitions-from-system (system)
+(defun extract-definitions-from-system (system &rest args &key . #.+keywords+)
+  #.+ignore+
+  (when (not static-files)
+    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
+      (when-let ((lines (uiop:run-program (print (format nil "find ~a -name \"README*\"" dir))
+                                          :output :lines)))
+        (setf static-files lines))))
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-definitions
      (lambda ()
+       (dolist (file static-files)
+         (add-def :name (make-keyword (pathname-name file))
+                  :doctype (pathname-type file)
+                  :file file
+                  :docstring (read-file-into-string file)))
        (with-compilation-unit ()
          (let ((*compile-print* nil)
                (*compile-verbose* nil))
@@ -48,6 +59,12 @@
     (let ((hp (asdf:system-homepage (asdf:find-system system))))
       (when (search "https://github.com/" hp)
         (format nil "~a/blob/master" hp))))
+  (when (not static-files)
+    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
+      (when-let ((lines (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
+                                          :output :lines)))
+        (setf (getf args :static-files)
+              lines))))
   (apply #'generate-commondoc
          (extract-definitions-from-system system)
          args))
@@ -73,6 +90,14 @@
       (when (search "https://github.com/" hp)
         (setf (getf args :remote-root)
               (format nil "~a/blob/master" hp)))))
+
+  (when (not static-files)
+    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
+      (when-let ((lines (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
+                                          :output :lines)))
+        (setf (getf args :static-files)
+              lines))))
+  
   (let ((defs (extract-definitions-from-system system)))
     (if loop
         (loop

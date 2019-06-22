@@ -27,6 +27,7 @@
                              (clean nil)
                              (remote-root nil)
                              (local-root nil)
+                             (static-files nil)
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
   (defparameter +ignore+
