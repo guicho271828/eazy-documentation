@@ -25,6 +25,8 @@
                              (font-list  *default-fonts*)
                              (external-only t)
                              (clean nil)
+                             (remote-root nil)
+                             (local-root nil)
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
   (defparameter +ignore+
@@ -147,20 +149,27 @@
              (when (not (equal file pfile))
                (push
                 (make-section (make-content
-                               (list* (make-text
+                               (list+ (make-text
                                        (ignore-errors (pathname-name pfile))
                                        :metadata (classes "file"))
                                       (make-text
                                        (ignore-errors (pathname-type pfile))
                                        :metadata (classes "extension"))
+                                      
                                       (when pfile
-                                        (list
-                                         (make-web-link
-                                          ;; TODO : github link
-                                          ;; note: uiop:enough-pathname
-                                          (format nil "file://~a" (namestring pfile))
-                                          (list (span "[source]"))
-                                          :metadata (classes "source-link"))))))
+                                        (if (and remote-root local-root)
+                                            (make-web-link
+                                             (format nil "~a/~a"
+                                                     remote-root
+                                                     (uiop:enough-pathname local-root pfile))
+                                             (list (span "[edit on web]"))
+                                             :metadata (classes "source-link"))
+                                            (make-web-link
+                                             ;; TODO : github link
+                                             ;; note: uiop:enough-pathname
+                                             (format nil "file://~a" (namestring pfile))
+                                             (list (span "[source]"))
+                                             :metadata (classes "source-link"))))))
                               :children
                               (reverse tmp-file-sections))
                 tmp-dir-sections)
