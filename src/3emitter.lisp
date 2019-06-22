@@ -230,6 +230,9 @@
      (list (span (format nil "~(~{~a~^ ~}~)" (args def))))
      :metadata (classes "args"))))
 
+(defun print-package (def)
+  (flet ((down (x) (string-downcase (princ-to-string x))))
+    (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
 (defun make-section-from-similar-defs (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
@@ -246,6 +249,7 @@
                            (span "," "sep2")))
                        (collecting
                          (span-id (down (name def)) "name" (down (doctype def)))))
+                 (print-package (first defs)) 
                  (print-args (first defs))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
@@ -263,6 +267,7 @@
                  (collecting (span (down (doctype def)) "doctype")))
            (span ":" "sep1")
            (span-id (down (name (first defs))) "name")
+           (print-package (first defs))
            (print-args (first defs)))
          :children (optional-list
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
@@ -279,6 +284,7 @@
              (span (down (doctype def)) "doctype")
              (span ":" "sep1")
              (span-id (down (name def)) "name")
+             (print-package def)
              (print-args def)))
            :children
            (list+
