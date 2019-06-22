@@ -14,23 +14,27 @@
   #.+ignore+
   (when (not static-files)
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (uiop:run-program (print (format nil "find ~a -name \"README*\"" dir))
-                                          :output :lines)))
+      (when-let ((lines (append
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
+                                             :output :lines))
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~adoc/" dir)
+                                             :output :lines)))))
         (setf static-files lines))))
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-definitions
      (lambda ()
        (dolist (file static-files)
-         (add-def :name nil
-                  :doctype 'static-file
-                  :file file
-                  :docstring
-                  (uiop:with-temporary-file (:pathname p :type "html")
-                    (uiop:run-program
-                     (format nil "pandoc -o ~a ~a" p file))
-                    (uiop:run-program
-                     (format nil "sed -i 's@~a@~a@g' ~a" local-root remote-root p))
-                    (read-file-into-string p))))
+         (ignore-errors
+           (add-def :name (make-keyword (pathname-name file))
+                    :doctype 'static-file
+                    :file file
+                    :docstring
+                    (uiop:with-temporary-file (:pathname p :type "html")
+                      (uiop:run-program
+                       (format nil "pandoc -o ~a ~a" p file))
+                      (read-file-into-string p)))))
        (with-compilation-unit ()
          (let ((*compile-print* nil)
                (*compile-verbose* nil))
