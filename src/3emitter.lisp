@@ -151,36 +151,41 @@
            (return doc)))))
 
 (defun span (string &rest classes)
-  (make-text (string string) :metadata (plist-hash-table `("html:class" ,(format nil "~{~a~^,~}" classes)))))
+  (make-text (string string)
+             :metadata
+             (plist-hash-table
+              `("html:class" ,(format nil "~{~a~^,~}" classes)))))
+
+
 
 (defun make-section-from-similar-defs (defs mode)
   (ecase mode
     (:missing-docs
      (make-paragraph
-      (append (list (span (doctype (first-elt defs)) "doctype"))
-              (iter (for def in defs)
-                    (collecting
-                      (span (name def) "name" (doctype def))))
-              (list (span "(documentation missing)" "docstring-missing")))))
+      `(,(span (doctype (first-elt defs)) "doctype")
+         ,@(iter (for def in defs)
+                 (collecting
+                   (span (name def) "name" (doctype def))))
+         ,(span "(documentation missing)" "docstring-missing"))))
     (:shared-docstring
      (make-paragraph
-      (append (list (span (doctype (first-elt defs)) "doctype"))
-              (iter (for def in defs)
-                    (collecting
-                      (span (name def) "name" (doctype def))))
-              (list (span (docstring (first-elt defs)) "docstring")))))
+      `(,(span (doctype (first-elt defs)) "doctype")
+         ,@(iter (for def in defs)
+                 (collecting
+                   (span (name def) "name" (doctype def))))
+         ,(span (docstring (first-elt defs)) "docstring"))))
     (:same-name
      (make-paragraph
-      (append (iter (for def in defs)
-                    (collecting
-                      (span (doctype def) "doctype")))
-              (list (span (name (first-elt defs)) "name")
-                    (span (iter (for def in defs)
-                                (for docstring = (ignore-errors (docstring def)))
-                                (finding docstring
-                                         such-that docstring
-                                         on-failure "(documentation missing)"))
-                          "docstring")))))
+      `(,@(iter (for def in defs)
+                (collecting
+                  (span (doctype def) "doctype")))
+          ,(span (name (first-elt defs)) "name")
+          ,(span (iter (for def in defs)
+                       (for docstring = (ignore-errors (docstring def)))
+                       (finding docstring
+                                such-that docstring
+                                on-failure "(documentation missing)"))
+                 "docstring"))))
     ((nil)
      (assert (= 1 (length defs)))
      (make-paragraph
