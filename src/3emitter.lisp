@@ -199,11 +199,11 @@
 
 (defun span (string &rest classes)
   (make-text (string string)
-             :metadata (apply #'classes classes)))
+             :metadata (when classes (apply #'classes classes))))
 
 (defun span-id (string &rest classes)
   (make-text (string string)
-             :metadata (apply #'classes classes)
+             :metadata (when classes (apply #'classes classes))
              :reference (string string)))
 
 (defun par (string &rest classes)
