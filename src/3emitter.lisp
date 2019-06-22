@@ -6,11 +6,17 @@
   "A list of strings for Google font name")
 
 (defparameter *default-css*
-  (list (asdf:system-relative-pathname :eazy-documentation "default/css/default.css"))
+  (list (asdf:system-relative-pathname :eazy-documentation "default/css/default.css")
+        (asdf:system-relative-pathname :eazy-documentation "default/css/dark.css")
+        ;; (asdf:system-relative-pathname :eazy-documentation "default/css/github.css")
+        ;; (asdf:system-relative-pathname :eazy-documentation "default/css/vestigial.css")
+        ;; (asdf:system-relative-pathname :eazy-documentation "default/css/wookie.css")
+        )
   "A list of CSS stylesheet pathnames to be loaded in the html by default.")
 
 (defparameter *default-js*
-  (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js"))
+  (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js")
+        (asdf:system-relative-pathname :eazy-documentation "default/js/highlight-lisp.js"))
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
 (defvar *ids*)                    ; a hash table for entry IDs --- WIP

@@ -24,6 +24,8 @@
         (dolist (js js-list)
           (cl-who:htm
            (:script :type "text/javascript" :src js)))
+        (:script :type "text/javascript"
+                 "window.onload = function(){HighlightLisp.highlight_auto({className: 'lisp'});};")
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body
@@ -45,6 +47,8 @@
         (dolist (js js-list)
           (cl-who:htm
            (:script :type "text/javascript" :src js)))
+        (:script :type "text/javascript"
+                 "window.onload = function(){HighlightLisp.highlight_auto({className: 'lisp'});};")
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body
