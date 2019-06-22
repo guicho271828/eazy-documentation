@@ -236,6 +236,9 @@
 
 (defun list+ (&rest args) (remove nil (flatten args)))
 
+(defun print-args (def)
+  (format nil "~(~{~a~^ ~}~)" (args def)))
+
 (defun make-section-from-similar-defs (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (ecase mode
@@ -252,7 +255,7 @@
                        (collecting
                          (span-id (down (name def)) "name" (down (doctype def)))))
                  (ignore-errors
-                   (span (down (princ-to-string (args (first defs)))) "args"))))
+                   (span (print-args (first defs)) "args"))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
@@ -270,7 +273,7 @@
            (span ":" "sep1")
            (span-id (down (name (first defs))) "name")
            (ignore-errors
-             (span (down (princ-to-string (args (first defs)))) "args")))
+             (span (print-args (first defs)) "args")))
          :children (optional-list
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
                       (par doc "docstring")
@@ -287,7 +290,7 @@
              (span ":" "sep1")
              (span-id (down (name def)) "name")
              (ignore-errors
-               (span (down (princ-to-string (args (first defs)))) "args"))))
+               (span (print-args (first defs)) "args"))))
            :children
            (list+
             (if-let ((docstring (ignore-errors (docstring def))))
