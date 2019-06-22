@@ -128,21 +128,21 @@
                (push
                 (make-section (make-content
                                (list (make-text
-                                      (pathname-name pfile)
+                                      (ignore-errors (pathname-name pfile))
                                       :metadata (classes "file"))
                                      (make-text
-                                      (pathname-type pfile)
+                                      (ignore-errors (pathname-type pfile))
                                       :metadata (classes "extension"))))
                               :children (reverse tmp-file-sections))
                 tmp-dir-sections)
                (setf tmp-file-sections nil))
              
              ;; make a new section across the directory boundary
-             (when (not (equal (pathname-directory file)
-                               (pathname-directory pfile)))
+             (when (not (equal (ignore-errors (pathname-directory file))
+                               (ignore-errors (pathname-directory pfile))))
                (push
                 (make-section (make-text
-                               (lastcar (pathname-directory pfile))
+                               (lastcar (ignore-errors (pathname-directory pfile)))
                                :metadata (classes "directory"))
                               :children (reverse tmp-dir-sections))
                 tmp-sections)
