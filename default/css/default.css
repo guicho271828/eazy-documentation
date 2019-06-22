@@ -1,7 +1,8 @@
+/* font, style */
 html {
-  background: white;
+  background: lightgray;
   color: black;
-  font-family: Helvetica Neue, Helvetica, Lato, Arial, sans-serif;
+  font-family: "Raleway", sans-serif;
   font-weight: medium;
   line-height: 1.4;
   margin: 0 1.4em 0 1.4em;
@@ -17,6 +18,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: smaller; }
 
 .main {
+  background: white;
   width: 40em;
   margin: 1em 1em 1em 1em; }
 
