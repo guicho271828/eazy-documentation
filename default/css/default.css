@@ -1,3 +1,91 @@
+html {
+  background: white;
+  color: black;
+  font-family: Helvetica Neue, Helvetica, Lato, Arial, sans-serif;
+  font-weight: medium;
+  line-height: 1.4;
+  margin: 0 1.4em 0 1.4em;
+  padding: 0; }
 
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0.7em;
+  margin-bottom: 0.3em; }
+
+.missing {
+  color: lightgray;
+  font-style: italic; }
+
+.docstring {
+  margin-left: 1em; }
+
+.directory:before {
+  content: "Directory";
+  color: gray;
+  margin-right: 0.3em; }
+.directory:after {
+  content: "/";
+  color: gray;
+  margin-left: 0.1em; }
+
+.file {
+  font-style: italic; }
+  .file:before {
+    content: "File";
+    color: gray;
+    margin-right: 0.3em; }
+
+.extension {
+  font-style: italic;
+  color: gray; }
+  .extension:before {
+    content: "."; }
+
+.sep1 {
+  margin-right: 0.3em; }
+
+.sep2 {
+  margin-left: 0.1em;
+  margin-right: 0.1em; }
+
+a {
+  text-decoration: none; }
+
+.toc .directory, .toc .file, .toc .extension, .toc .directory:before, .toc .directory:after, .toc .file:before {
+  font-style: inherit;
+  color: inherit; }
+
+@media all and (min-width: 64.4em) {
+  /* header.logotype { */
+  /*     position: fixed; */
+  /*     top: 0em; */
+  /*     left: 2.4em; */
+  /*     text-align: left; */
+  /* } */
+  /* aside.meta { */
+  /*     width: 13.2em; */
+  /*     position: fixed; */
+  /*     top: 7.2em; */
+  /*     left: 3em; */
+  /*     text-align: left; */
+  /* } */
+  /* aside.footer { */
+  /*     width: 13.2em; */
+  /*     position: fixed; */
+  /*     top: 9em; */
+  /*     left: 3em; */
+  /*     text-align: left; */
+  /* } */
+  /* aside.meta span:after { */
+  /*     content:"\a"; */
+  /*     white-space: pre; */
+  /* } */
+  /* body { */
+  /*     margin-left: 24em; */
+  /* } */ }
+@media all and (max-width: 30em) {
+  /* aside.meta span:after { */
+  /*     content:"\a"; */
+  /*     white-space: pre; */
+  /* } */ }
 
 /*# sourceMappingURL=default.css.map */
