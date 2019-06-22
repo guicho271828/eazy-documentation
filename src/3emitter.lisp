@@ -33,11 +33,11 @@
         (let ((directory (make-pathname :name nil :type nil :defaults pathname)))
           (dolist (src (append css-list js-list))
             ;; don't copy if it already exists
-            (ignore-errors
-              (copy-file src (make-pathname :name (pathname-name src)
-                                            :type (pathname-type src)
-                                            :directory (pathname-directory directory))
-                         :if-to-exists :error)))
+            (let ((dst (make-pathname :name (pathname-name src)
+                                      :type (pathname-type src)
+                                      :directory (pathname-directory directory))))
+              (unless (probe-file dst)
+                (copy-file src dst))))
           (with-open-file (s pathname
                              :direction :output
                              :if-exists :supersede
@@ -47,11 +47,11 @@
         (let ((directory (uiop:ensure-directory-pathname pathname)))
           (dolist (src (append css-list js-list))
             ;; don't copy if it already exists
-            (ignore-errors
-              (copy-file src (make-pathname :name (pathname-name src)
-                                            :type (pathname-type src)
-                                            :directory (pathname-directory directory))
-                         :if-to-exists :error)))
+            (let ((dst (make-pathname :name (pathname-name src)
+                                      :type (pathname-type src)
+                                      :directory (pathname-directory directory))))
+              (unless (probe-file dst)
+                (copy-file src dst))))
           (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
     pathname))
 
