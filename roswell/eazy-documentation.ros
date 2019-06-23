@@ -1,0 +1,33 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(:eazy-documentation :trivia) :silent t)
+  )
+
+(defpackage :ros.script.eazy-documentation.3770268472
+  (:use :cl :trivia :eazy-documentation))
+(in-package :ros.script.eazy-documentation.3770268472)
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+
+  (match argv
+    ((list* file-or-system output rest)
+     (if (probe-file file-or-system)
+         (apply #'generate-html-from-file   file-or-system output rest)
+         (apply #'generate-html-from-system file-or-system output rest)))
+    (nil
+     (format *error-output*
+             "~&Usage: eazy-documentation file-or-system output [OPTIONS]~%~
+             ~%~
+             ~% The output is a single file when the output has a html extension;~
+             ~% otherwise it will be considered as a directory name.~
+             ~%~
+             ~% Options are specified as follows:~
+             ~%~
+             ~a" #.(convert-string-to-ascii-string +doc+ "org")))))
+;;; vim: set ft=lisp lisp:

@@ -54,7 +54,12 @@ Advantages over the existing libraries:
    #:generate-commondoc-from-file
    #:generate-commondoc-from-system
    #:generate-html-from-file
-   #:generate-html-from-system))
+   #:generate-html-from-system
+   #:+doc+
+   #:convert-file-to-html-string
+   #:convert-string-to-html-string
+   #:convert-file-to-ascii-string
+   #:convert-string-to-ascii-string))
 
 (in-package :eazy-documentation)
 

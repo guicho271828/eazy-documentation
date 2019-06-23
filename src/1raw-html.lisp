@@ -26,3 +26,14 @@
   (uiop:with-temporary-file (:pathname p :type markup)
     (write-string-into-file string p :if-exists :supersede)
     (convert-file-to-html-string p)))
+
+(defun convert-file-to-ascii-string (file)
+  (uiop:with-temporary-file (:pathname p :type "txt")
+    (uiop:run-program
+     (format nil "pandoc -o ~a ~a" p file))
+    (read-file-into-string p)))
+
+(defun convert-string-to-ascii-string (string markup)
+  (uiop:with-temporary-file (:pathname p :type markup)
+    (write-string-into-file string p :if-exists :supersede)
+    (convert-file-to-ascii-string p)))
