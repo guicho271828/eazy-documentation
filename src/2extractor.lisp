@@ -28,6 +28,7 @@
 
 (defun extract-definitions (form)
   (match form
+    #+(or)
     ((list* 'setf args)
      (parse-setf args))
     ((list* macro _)
