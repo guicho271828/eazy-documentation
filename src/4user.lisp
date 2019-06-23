@@ -49,7 +49,7 @@
 (defun generate-commondoc-from-file (file &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title)
+  (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
   (apply #'generate-commondoc
          (extract-definitions-from-file file)
@@ -58,7 +58,7 @@
 (defun generate-commondoc-from-system (system &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title)
+  (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
   (when (not local-root)
     (setf (getf args :local-root)
@@ -80,7 +80,7 @@
 (defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title)
+  (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
   (apply #'generate-html
          (extract-definitions-from-file file)
@@ -90,7 +90,7 @@
 (defun generate-html-from-system (system pathname &rest args &key loop . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title)
+  (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
   (when (not local-root)
     (setf (getf args :local-root)
