@@ -23,6 +23,9 @@
                            (uiop:run-program (format nil "find ~adoc/ -type f" dir)
                                              :output :lines)))))
         (setf static-files lines))))
+  (let ((*compile-print* nil)
+        (*compile-verbose* nil))
+    (asdf:load-system system))
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-definitions
      (lambda ()
