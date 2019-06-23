@@ -181,7 +181,15 @@
                                (ignore-errors (pathname-directory pfile))))
                (push
                 (make-section (make-text
-                               (lastcar (ignore-errors (pathname-directory pfile)))
+                               (if local-root
+                                   (namestring
+                                    (let ((dir (pathname-directory
+                                                (uiop:enough-pathname pfile local-root))))
+                                      (make-pathname
+                                       :name (lastcar dir)
+                                       :type nil
+                                       :directory (butlast dir))))
+                                   (lastcar (ignore-errors (pathname-directory pfile))))
                                :metadata (classes "directory"))
                               :children (reverse tmp-dir-sections))
                 tmp-sections)
