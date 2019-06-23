@@ -183,7 +183,7 @@ Options:
             ((class def file)
 
              ;; make a new section when the new def should not be grouped
-             (when (not compatible)
+             (unless (and compatible (if pmode (eq pmode mode) t))
                (push (make-section-from-similar-defs (reverse tmp-defs) pmode markup)
                      tmp-file-sections)
                (setf tmp-defs nil))
