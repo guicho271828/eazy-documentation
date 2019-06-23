@@ -66,7 +66,11 @@
                      (and (not s1) (not s2)))
                  (or (and a1 a2 args)
                      (and (not a1) (not a2))))
-            (values t :same-name))))))))
+            (values t :same-name))
+           ((and (eq (symbol-package n1) ; same package
+                     (symbol-package n2))
+                 (and s1 s2 string))
+            (values t :same-docstring))))))))
 
 (defun left (a b) (declare (ignore b)) a)
 

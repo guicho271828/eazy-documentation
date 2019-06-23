@@ -327,6 +327,26 @@ Options:
                       (par (convert-string-to-html-string doc markup) "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
+      (:same-docstring
+       (div
+        (iter (for def in defs)
+              (collecting
+                (div
+                 (make-section
+                  (list 
+                   (span (down (doctype def)) "doctype")
+                   (span ":" "sep1")
+                   (span-id (down (name def)) "name")
+                   (print-package def)
+                   (print-args def))
+                  :children
+                  (if (first-iteration-p)
+                      (list
+                       (par (convert-string-to-html-string
+                             (docstring (first defs)) markup) "docstring"))
+                      (list
+                       (par "(same as above)" "missing"))))
+                 :metadata (classes "entry"))))))
       ((nil)
        (assert (= 1 (length defs)))
        (let ((def (first defs)))
