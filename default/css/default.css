@@ -155,7 +155,25 @@ a {
     color: gray; }
 
 pre {
-  margin: 0; }
+  margin: 2px;
+  background: #404040;
+  border-color: gray;
+  border-width: 1px;
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 3px;
+  color: magenta; }
+  pre code {
+    border: none; }
+
+code {
+  background: #404040;
+  border-color: gray;
+  border-width: 1px;
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 3px;
+  color: magenta; }
 
 td {
   vertical-align: top; }
