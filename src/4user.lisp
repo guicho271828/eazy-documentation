@@ -30,7 +30,8 @@
          (ignore-errors
            (add-def :name (make-keyword (pathname-name file))
                     :doctype 'static-file
-                    :file file)))
+                    :file file
+                    :docstring (read-file-into-string file))))
        (with-compilation-unit ()
          (let ((*compile-print* nil)
                (*compile-verbose* nil))

@@ -2,7 +2,11 @@
 html {
   font-weight: medium;
   line-height: 1.4;
-  margin: 0 1.4em 0 1.4em;
+  margin: 0;
+  padding: 0; }
+
+body {
+  margin: 0;
   padding: 0; }
 
 h1, h2, h3, h4, h5, h6 {
@@ -15,7 +19,7 @@ h1, h2, h3, h4, h5, h6 {
     float: right;
     font-size: small; }
 
-.entry {
+.doc-entry {
   margin-top: 2em;
   margin-bottom: 2em; }
 
@@ -182,19 +186,19 @@ code {
 td {
   vertical-align: top; }
 
-.docstring h1, .docstring h2, .docstring h3, .docstring h4, .docstring h5, .docstring h6 {
+:not(.static-file) > .docstring h1, :not(.static-file) > .docstring h2, :not(.static-file) > .docstring h3, :not(.static-file) > .docstring h4, :not(.static-file) > .docstring h5, :not(.static-file) > .docstring h6 {
   margin-top: 1em; }
-.docstring h1 {
+:not(.static-file) > .docstring h1 {
   font-size: 120%; }
-.docstring h2 {
+:not(.static-file) > .docstring h2 {
   font-size: 110%; }
-.docstring h3 {
+:not(.static-file) > .docstring h3 {
   font-size: 100%; }
-.docstring h4 {
+:not(.static-file) > .docstring h4 {
   font-size: 90%; }
-.docstring h5 {
+:not(.static-file) > .docstring h5 {
   font-size: 80%; }
-.docstring h6 {
+:not(.static-file) > .docstring h6 {
   font-size: 70%; }
 
 .footer {

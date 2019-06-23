@@ -166,9 +166,10 @@ Options:
   (iter (for def in-vector defs)
         (for pdef previous def)
         (with tmp-defs = nil)
-        (with tmp-sections = nil)
-        (with tmp-dir-sections = nil)
+        (with tmp-entries = nil)
+        (with tmp-doc-entries = nil)
         (with tmp-file-sections = nil)
+        (with tmp-dir-sections = nil)
 
         (for pfile =
              (when (not (first-iteration-p))
@@ -177,17 +178,37 @@ Options:
              (when (not (first-iteration-p))
                (def~ def pdef)))
         (for pmode previous mode)
+
+        (for (values doc-compatible docmode) =
+             (when (not (first-iteration-p))
+               (def~doc def pdef)))
+        (for pdocmode previous docmode)
+        
         (for i from 0)
+
+        #+(or)
+        (let ((*print-level 2))
+          (break "~{~a~^ ~}"
+                 (list tmp-defs
+                       tmp-entries
+                       tmp-doc-entries
+                       tmp-file-sections
+                       tmp-doc-entries)))
         
         (when (not (first-iteration-p))
           (ematch def
             ((class def file)
 
              ;; make a new section when the new def should not be grouped
-             (unless (and compatible (if pmode (eq pmode mode) t))
-               (push (make-section-from-similar-defs (reverse tmp-defs) pmode markup)
-                     tmp-file-sections)
+             (unless (and compatible)
+               (push (make-entry (reverse tmp-defs) pmode)
+                     tmp-entries)
                (setf tmp-defs nil))
+
+             (unless (and doc-compatible)
+               (push (make-doc-entry (reverse tmp-entries) pdef markup)
+                     tmp-doc-entries)
+               (setf tmp-entries nil))
 
              ;; make a new section across the file boundary
              (when (not (equal file pfile))
@@ -210,11 +231,10 @@ Options:
                                              (format nil "file://~a" (namestring pfile))
                                              (list (span "[source]"))
                                              :metadata (classes "source-link"))))))
-                              :children
-                              (reverse tmp-file-sections)
+                              :children (reverse tmp-doc-entries)
                               :reference (ignore-errors (pathname-name pfile)))
-                tmp-dir-sections)
-               (setf tmp-file-sections nil))
+                tmp-file-sections)
+               (setf tmp-doc-entries nil))
              
              ;; make a new section across the directory boundary
              (when (not (equal (ignore-errors (pathname-directory file))
@@ -231,34 +251,38 @@ Options:
                                :directory (butlast dir))))
                            (lastcar (ignore-errors (pathname-directory pfile))))))
                   (make-section (make-text dirname :metadata (classes "directory"))
-                                :children (reverse tmp-dir-sections)
+                                :children (reverse tmp-file-sections)
                                 :reference dirname))
-                tmp-sections)
-               (setf tmp-dir-sections nil)))))
+                tmp-dir-sections)
+               (setf tmp-file-sections nil)))))
            
         (push def tmp-defs)
 
         (finally
          (when tmp-defs
            (push
-            (make-section-from-similar-defs (reverse tmp-defs) mode markup)
-            tmp-file-sections))
-         (when tmp-file-sections
+            (make-entry (reverse tmp-defs) mode)
+            tmp-entries))
+         (when tmp-entries
+           (push
+            (make-doc-entry (reverse tmp-entries) def markup)
+            tmp-doc-entries))
+         (when tmp-doc-entries
            (push
             (make-section (make-text
                            (pathname-name pfile)
                            :metadata (classes "file"))
-                          :children (reverse tmp-file-sections))
-            tmp-dir-sections))
-         (when tmp-dir-sections
+                          :children (reverse tmp-doc-entries))
+            tmp-file-sections))
+         (when tmp-file-sections
            (push
             (make-section (make-text
                            (lastcar (pathname-directory pfile))
                            :metadata (classes "directory"))
-                          :children (reverse tmp-dir-sections))
-            tmp-sections))
+                          :children (reverse tmp-file-sections))
+            tmp-dir-sections))
 
-         (return (div (reverse tmp-sections) :metadata (classes "main"))))))
+         (return (div (reverse tmp-dir-sections) :metadata (classes "main"))))))
 
 (defun classes (&rest classes)
   (plist-hash-table
@@ -298,11 +322,11 @@ Options:
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
-(defun make-section-from-similar-defs (defs mode markup)
+(defun make-entry (defs mode)
   (flet ((down (x) (string-downcase (princ-to-string x))))
-    (ecase mode
-      (:same-doctype
-       (div
+    (div
+     (ecase mode
+       (:same-doctype
         (make-section
          (div
           (list+ (span (down (doctype (first defs))) "doctype")
@@ -314,54 +338,21 @@ Options:
                        (collecting
                          (span-id (down (name def)) "name" (down (doctype def)))))
                  (print-package (first defs)) 
-                 (print-args (first defs))))
-         :children (list+
-                    (if-let ((doc (ignore-errors (docstring (first defs)))))
-                      (par (convert-string-to-html-string doc markup) "docstring")
-                      (par "(documentation missing)" "docstring" "missing"))))
-        :metadata (classes "entry")))
-      (:same-name
-       (div
+                 (print-args (first defs))))))
+       (:same-name
         (make-section
          (div
-          (list+
-           (iter (for def in defs)
-                 (unless (first-iteration-p)
-                   (collecting (span "," "sep2")))
-                 (collecting (span (down (doctype def)) "doctype")))
-           (span ":" "sep1")
-           (span-id (down (name (first defs))) "name")
-           (print-package (first defs))
-           (print-args (first defs))))
-         :children (list+
-                    (if-let ((doc (ignore-errors (docstring (first defs)))))
-                      (par (convert-string-to-html-string doc markup) "docstring")
-                      (par "(documentation missing)" "docstring" "missing"))))
-        :metadata (classes "entry")))
-      (:same-docstring
-       (div
-        (iter (for def in defs)
-              (collecting
-                (div
-                 (make-section
-                  (list 
-                   (span (down (doctype def)) "doctype")
-                   (span ":" "sep1")
-                   (span-id (down (name def)) "name")
-                   (print-package def)
-                   (print-args def))
-                  :children
-                  (if (first-iteration-p)
-                      (list
-                       (par (convert-string-to-html-string
-                             (docstring (first defs)) markup) "docstring"))
-                      (list
-                       (par "(same as above)" "missing"))))
-                 :metadata (classes "entry"))))))
-      ((nil)
-       (assert (= 1 (length defs)))
-       (let ((def (first defs)))
-         (div
+          (list+ (iter (for def in defs)
+                       (unless (first-iteration-p)
+                         (collecting (span "," "sep2")))
+                       (collecting (span (down (doctype def)) "doctype")))
+                 (span ":" "sep1")
+                 (span-id (down (name (first defs))) "name")
+                 (print-package (first defs))
+                 (print-args (first defs))))))
+       ((nil)
+        (assert (= 1 (length defs)))
+        (let ((def (first defs)))
           (if (not (eq 'static-file (doctype def))) 
               (make-section
                (div
@@ -370,15 +361,23 @@ Options:
                  (span ":" "sep1")
                  (span-id (down (name def)) "name")
                  (print-package def)
-                 (print-args def)))
-               :children
-               (list+
-                (if-let ((doc (ignore-errors (docstring def))))
-                  (par (convert-string-to-html-string doc markup) "docstring")
-                  (par "(documentation missing)" "docstring" "missing"))))
+                 (print-args def))))
               ;; process the static file
-              (par (convert-file-to-html-string (file def)) "static-file"))
-          :metadata (classes "entry")))))))
+              (make-content nil :metadata (classes "static-file"))))))
+     :metadata (classes "entry"))))
+
+(defun insert-docstring (def entry markup multi-p)
+  (push (if-let ((doc (ignore-errors (docstring def))))
+          (par (convert-string-to-html-string doc markup) "docstring")
+          (par (if multi-p
+                   "(all documentation missing)"
+                   "(documentation missing)")
+               "docstring" "missing"))
+        (children (first (children entry)))))
+
+(defun make-doc-entry (entries def markup)
+  (insert-docstring def (lastcar entries) markup (< 1 (length entries)))
+  (div entries :metadata (classes "doc-entry")))
 
 (defun table-of-contents (doc-or-node &key max-depth)
   "Extract a tree of document links representing the table of contents of a

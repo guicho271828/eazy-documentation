@@ -45,32 +45,40 @@
            (a1 (slot-boundp a 'args))
            (a2 (slot-boundp b 'args))   ;note: this is not let*
            (args (equal (ignore-errors a1) (ignore-errors a2)))
-           (s1 (slot-boundp a 'docstring))
-           (s2 (slot-boundp b 'docstring))
            (string (equal (ignore-errors s1) (ignore-errors s2))))
-       (when file
+       (when (and file string)
          ;; (break "~@{~a ~}" a b)
          (cond
            ;; different name, but same docstring, args, package
            ((and doctype
                  (eq (symbol-package n1) ; same package
                      (symbol-package n2))
-                 (or (and s1 s2 string)
-                     (and (not s1) (not s2)))
                  (or (and a1 a2 args)
                      (and (not a1) (not a2))))
             (values t :same-doctype))
            ;; different doctype, but same docstring, args
            ((and name
-                 (or (and s1 s2 string)
-                     (and (not s1) (not s2)))
                  (or (and a1 a2 args)
                      (and (not a1) (not a2))))
-            (values t :same-name))
-           ((and (eq (symbol-package n1) ; same package
-                     (symbol-package n2))
-                 (and s1 s2 string))
-            (values t :same-docstring))))))))
+            (values t :same-name))))))))
+
+(defun def~doc (a b)
+  "Compare the docstring.
+ Returns true when they are both missing or EQUAL."
+  (ematch* (a b)
+    (((def :docstring (place s1) :file f1)
+      (def :docstring (place s2) :file f2))
+     (let ((file (equal f1 f2))
+           (s1 (slot-boundp a 'docstring))
+           (s2 (slot-boundp b 'docstring))
+           (string (equal (ignore-errors s1) (ignore-errors s2))))
+       (when file
+         (cond
+           ;; different name, but same docstring, args, package
+           ((and s1 s2 string)
+            (values t :same-docstring))
+           ((and (not s1) (not s2))
+            (values t :missing-docstring))))))))
 
 (defun left (a b) (declare (ignore b)) a)
 
