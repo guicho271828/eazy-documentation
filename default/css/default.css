@@ -6,7 +6,7 @@ html {
   padding: 0; }
 
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 0.7em;
+  margin-top: 5em;
   margin-bottom: 0.3em;
   word-break: break-all; }
   h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
@@ -14,6 +14,10 @@ h1, h2, h3, h4, h5, h6 {
   h1 .source-link, h2 .source-link, h3 .source-link, h4 .source-link, h5 .source-link, h6 .source-link {
     float: right;
     font-size: small; }
+
+.entry {
+  margin-top: 2em;
+  margin-bottom: 2em; }
 
 .title {
   text-align: center; }
@@ -178,6 +182,8 @@ code {
 td {
   vertical-align: top; }
 
+.docstring h1, .docstring h2, .docstring h3, .docstring h4, .docstring h5, .docstring h6 {
+  margin-top: 1em; }
 .docstring h1 {
   font-size: 120%; }
 .docstring h2 {
