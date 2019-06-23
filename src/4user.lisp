@@ -16,10 +16,10 @@
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
       (when-let ((lines (append
                          (ignore-errors
-                           (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
+                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
                                              :output :lines))
                          (ignore-errors
-                           (uiop:run-program (format nil "find ~adoc/" dir)
+                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
                                              :output :lines)))))
         (setf static-files lines))))
   (uiop:with-temporary-file (:pathname p)
