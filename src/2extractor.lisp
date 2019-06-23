@@ -83,76 +83,56 @@
     ((list* macro rest)
      (setf (getf acc :doctype) macro)
 
-     (let ((lambda-list
-            (remove-macro-lambda-list-keywords
-             (sb-kernel:%fun-lambda-list (macro-function macro)))))
-       
-       (match lambda-list
-         ((list* _ _ '&body _ _)
-          ;; defun, defmacro, deftype and others
-          
-          (match rest
-            ((list* name-and-options args body)
-             
-             (ematch (ensure-list name-and-options)
-               ((list 'setf (type symbol))
-                (setf (getf acc :name) name-and-options))
-               ((list* (and name (type symbol)) _)
-                (setf (getf acc :name) name))
-               ((list* (and name (type string)) _)
-                (setf (getf acc :name) (intern (string-upcase name) :keyword))))
+     (match rest
+       ((list* name-and-options rest2)
+        
+        (ematch (ensure-list name-and-options)
+          ((list 'setf (type symbol))
+           (setf (getf acc :name) name-and-options))
+          ((list* (and name (type symbol)) _)
+           (setf (getf acc :name) name))
+          ((list* (and name (type string)) _)
+           (setf (getf acc :name) (intern (string-upcase name) :keyword))))
 
-             (when (listp args)
-               (setf (getf acc :args)
-                     (remove-macro-lambda-list-keywords args)))
+        (if (or #+sbcl
+                (match (remove-macro-lambda-list-keywords
+                        (sb-kernel:%fun-lambda-list (macro-function macro)))
+                  ((list* _ _ '&body _ _)
+                   t))
+                (member macro '(defun defgeneric defmethod deftype
+                                define-modify-macro define-compiler-macro
+                                define-setf-expander)))
+            ;; defun, defmacro, deftype and others
+            (match rest2
+              ((list* args body)
 
-             (when-let ((it (find-if #'natural-language-string-p body)))
-               (setf (getf acc :docstring) it))
+               (when (listp args)
+                 (setf (getf acc :args)
+                       (remove-macro-lambda-list-keywords args)))
 
-             (multiple-value-bind (body decl docstring) (parse-body body :documentation t)
-               (declare (ignore body decl))
-               (when (natural-language-string-p docstring)
-                 (setf (getf acc :docstring) docstring)))
-             
-             ;; defgeneric / defclass / defpackage-style documentation
-             ;; defsystem
-             (labels ((rec (list)
-                        (match list
-                          ((list* (or :description :documentation) docstring rest)
-                           (when (natural-language-string-p docstring)
-                             (setf (getf acc :docstring) docstring))
-                           (rec rest))
-                          ((list* _ rest)
-                           (rec rest)))))
-               (rec (flatten form))))))
+               (when-let ((it (find-if #'natural-language-string-p body)))
+                 (setf (getf acc :docstring) it))
 
-         (_
-          
-          (match rest
-            ((list* name-and-options rest2)
-             
-             (ematch (ensure-list name-and-options)
-               ((list 'setf (type symbol))
-                (setf (getf acc :name) name-and-options))
-               ((list* (and name (type symbol)) _)
-                (setf (getf acc :name) name))
-               ((list* (and name (type string)) _)
-                (setf (getf acc :name) (intern (string-upcase name) :keyword))))
+               (multiple-value-bind (body decl docstring) (parse-body body :documentation t)
+                 (declare (ignore body decl))
+                 (when (natural-language-string-p docstring)
+                   (setf (getf acc :docstring) docstring)))))
 
-             (when-let ((it (find-if #'natural-language-string-p rest2)))
-               (setf (getf acc :docstring) it))))
-
-          ;; defgeneric / defclass / defpackage-style documentation
-          ;; defsystem
-          (labels ((rec (list)
-                     (match list
-                       ((list* (or :description :documentation) docstring rest)
-                        (when (natural-language-string-p docstring)
-                          (setf (getf acc :docstring) docstring))
-                        (rec rest))
-                       ((list* _ rest)
-                        (rec rest)))))
-            (rec (flatten form))))))
+            ;; defvar, etc, or unknown macros
+            (when-let ((it (find-if #'natural-language-string-p rest2)))
+              (setf (getf acc :docstring) it)))))
+     
+     ;; defgeneric / defclass / defpackage-style documentation
+     ;; defsystem
+     (labels ((rec (list)
+                (match list
+                  ((list* (or :description :documentation) docstring rest)
+                   (when (natural-language-string-p docstring)
+                     (setf (getf acc :docstring) docstring))
+                   (rec rest))
+                  ((list* _ rest)
+                   (rec rest)))))
+       (rec (flatten form)))
      
      (apply #'add-def acc))))
 
