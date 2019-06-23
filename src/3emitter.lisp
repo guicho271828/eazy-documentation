@@ -34,25 +34,28 @@
   (defparameter +doc+ "
 Options:
 
- keyword, default
- :title \"(no title)\"   --- Documentation title
- :markup \"org\"         --- Markup langage used in the docstring, should be supported by pandoc.
-
- :whitelist nil    --- Whitelist of the package designators for the symbols being documented
- :blacklist nil    --- Blacklist of the package designators for the symbols being documented
- :external-only t  --- Generate entries for external symbols only
- :toc t            --- Generate a table of contents (toc)
- :max-depth 2      --- The maximum depth of a toc
-
- :template-class 'eazy-template  --- COMMON-HTML template class, no need to be chanded.
- :css-list *default-css*         --- List of CSS scripts to be added to the template.
- :js-list  *default-js*          --- List of Javascripts to be added to the template.
- :font-list  *default-fonts*     --- List of Google fonts to be added to the template.
- :clean nil                      --- Overwrite CSS/JS in the target directory
-
- :remote-root nil  --- Used to generate a weblink. Example: https://github.com/<name>/<proj>
- :local-root nil   --- Used to generate a weblink. Example: /home/<user>/lisp/<proj>
- :static-files nil --- List of static README files etc.
+| keyword           | description                                                           |
+|-------------------+-----------------------------------------------------------------------|
+| =:title=          | Documentation title                                                   |
+| =:markup=         | Markup langage used in the docstring, should be supported by pandoc.  |
+|-------------------+-----------------------------------------------------------------------|
+| =:whitelist=      | Whitelist of the package designators for the symbols being documented |
+| =:blacklist=      | Blacklist of the package designators for the symbols being documented |
+| =:external-only=  | Generate entries for external symbols only                            |
+|-------------------+-----------------------------------------------------------------------|
+| =:toc=            | Generate a table of contents (toc)                                    |
+| =:max-depth=      | The maximum depth of a toc                                            |
+|-------------------+-----------------------------------------------------------------------|
+| =:template-class= | COMMON-HTML template class, no need to be chanded.                    |
+| =:css-list=       | List of CSS scripts to be added to the template.                      |
+| =:js-list=        | List of Javascripts to be added to the template.                      |
+| =:font-list=      | List of Google fonts to be added to the template.                     |
+| =:clean=          | Overwrite CSS/JS in the target directory                              |
+|-------------------+-----------------------------------------------------------------------|
+| =:remote-root=    | Used to generate a weblink. Example: https://github.com/<name>/<proj> |
+| =:local-root=     | Used to generate a weblink. Example: /home/<user>/lisp/<proj>         |
+| =:static-files=   | List of static README files etc.                                      |
+|-------------------+-----------------------------------------------------------------------|
 " )
   (defparameter +ignore+
     `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))))

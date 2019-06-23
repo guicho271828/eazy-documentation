@@ -149,4 +149,7 @@ a {
 pre {
   margin: 0; }
 
+td {
+  vertical-align: top; }
+
 /*# sourceMappingURL=default.css.map */
