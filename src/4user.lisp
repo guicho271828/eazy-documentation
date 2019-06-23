@@ -11,6 +11,7 @@
        *defs*))))
 
 (defun extract-definitions-from-system (system &key . #.+keywords+)
+  #.+doc+
   #.+ignore+
   (when (not static-files)
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
@@ -46,6 +47,7 @@
 ;; read time
 
 (defun generate-commondoc-from-file (file &rest args &key . #.+keywords+)
+  #.+doc+
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
@@ -54,6 +56,7 @@
          args))
 
 (defun generate-commondoc-from-system (system &rest args &key . #.+keywords+)
+  #.+doc+
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
@@ -75,6 +78,7 @@
          args))
 
 (defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
+  #.+doc+
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
@@ -84,6 +88,7 @@
          args))
 
 (defun generate-html-from-system (system pathname &rest args &key loop . #.+keywords+)
+  #.+doc+
   #.+ignore+
   (when (not title)
     (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
