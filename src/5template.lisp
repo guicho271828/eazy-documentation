@@ -4,9 +4,7 @@
 (defclass eazy-template (common-html.template:template)
   ((css-list :type list :initarg :css-list :initform *default-css*)
    (font-list :type list :initarg :font-list :initform *default-fonts*)
-   (js-list  :type list :initarg :js-list  :initform *default-js*)
-   (header :type string :initarg :header :initform "")
-   (footer :type string :initarg :footer :initform "")))
+   (js-list  :type list :initarg :js-list  :initform *default-js*)))
 
 (defmethod common-html.template:render ((template eazy-template)
                                         (document document)
@@ -29,9 +27,7 @@
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body
-        (cl-who:str header)
-        (cl-who:str content-string)
-        (cl-who:str footer))))))
+        (cl-who:str content-string))))))
 
 (defmethod common-html.template:render-section ((template eazy-template) (document document) (section section)
                            content-string)
@@ -52,8 +48,6 @@
         (:title
          (cl-who:str (plump:encode-entities (title document)))))
        (:body
-        (cl-who:str header)
-        (cl-who:str content-string)
-        (cl-who:str footer))))))
+        (cl-who:str content-string))))))
 
 
