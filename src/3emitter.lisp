@@ -202,7 +202,8 @@ Options:
                                              (list (span "[source]"))
                                              :metadata (classes "source-link"))))))
                               :children
-                              (reverse tmp-file-sections))
+                              (reverse tmp-file-sections)
+                              :reference (ignore-errors (pathname-name pfile)))
                 tmp-dir-sections)
                (setf tmp-file-sections nil))
              
@@ -210,18 +211,19 @@ Options:
              (when (not (equal (ignore-errors (pathname-directory file))
                                (ignore-errors (pathname-directory pfile))))
                (push
-                (make-section (make-text
-                               (if local-root
-                                   (namestring
-                                    (let ((dir (pathname-directory
-                                                (uiop:enough-pathname pfile local-root))))
-                                      (make-pathname
-                                       :name (lastcar dir)
-                                       :type nil
-                                       :directory (butlast dir))))
-                                   (lastcar (ignore-errors (pathname-directory pfile))))
-                               :metadata (classes "directory"))
-                              :children (reverse tmp-dir-sections))
+                (let ((dirname
+                       (if local-root
+                           (namestring
+                            (let ((dir (pathname-directory
+                                        (uiop:enough-pathname pfile local-root))))
+                              (make-pathname
+                               :name (lastcar dir)
+                               :type nil
+                               :directory (butlast dir))))
+                           (lastcar (ignore-errors (pathname-directory pfile))))))
+                  (make-section (make-text dirname :metadata (classes "directory"))
+                                :children (reverse tmp-dir-sections)
+                                :reference dirname))
                 tmp-sections)
                (setf tmp-dir-sections nil)))))
            
