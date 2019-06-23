@@ -140,17 +140,17 @@ Options:
                :metadata (classes "footer"))
           (children doc))
     (push main (children doc))
-    (when toc
-      (common-doc.ops:fill-unique-refs doc)
-      (push (div (make-section
-                  (make-text "Index")
-                  :children
-                  (list (table-of-contents main :max-depth max-depth)))
-                 :metadata (classes "table-of-contents"))
-            (children doc)))
-    (push (div (make-section (make-text title)
-                             :children (list (make-text header)))
-               :metadata (classes "header"))
+    (common-doc.ops:fill-unique-refs doc)
+    (push (div
+           (list (div (make-section
+                       (make-text title)
+                       :children (list (span header)))
+                      :metadata (classes "title"))
+                 (div (make-section
+                       (make-text "Index")
+                       :children (list (table-of-contents main :max-depth max-depth)))
+                      :metadata (classes "table-of-contents")))
+           :metadata (classes "page-header"))
           (children doc))
     doc))
 
