@@ -59,7 +59,7 @@
   #.+doc+
   #.+ignore+
   (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
+    (setf (getf args :title) (format nil "~a" system)))
   (when (not local-root)
     (setf (getf args :local-root)
           (asdf:system-source-directory (asdf:find-system system))))
@@ -91,7 +91,7 @@
   #.+doc+
   #.+ignore+
   (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~@(~a~) documentation" system)))
+    (setf (getf args :title) (format nil "~a" system)))
   (when (not local-root)
     (setf (getf args :local-root)
           (asdf:system-source-directory (asdf:find-system system))))
