@@ -152,4 +152,17 @@ pre {
 td {
   vertical-align: top; }
 
+.docstring h1 {
+  font-size: 120%; }
+.docstring h2 {
+  font-size: 110%; }
+.docstring h3 {
+  font-size: 100%; }
+.docstring h4 {
+  font-size: 90%; }
+.docstring h5 {
+  font-size: 80%; }
+.docstring h6 {
+  font-size: 70%; }
+
 /*# sourceMappingURL=default.css.map */
