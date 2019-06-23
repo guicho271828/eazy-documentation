@@ -29,12 +29,7 @@
          (ignore-errors
            (add-def :name (make-keyword (pathname-name file))
                     :doctype 'static-file
-                    :file file
-                    :docstring
-                    (uiop:with-temporary-file (:pathname p :type "html")
-                      (uiop:run-program
-                       (format nil "pandoc -o ~a ~a" p file))
-                      (read-file-into-string p)))))
+                    :file file)))
        (with-compilation-unit ()
          (let ((*compile-print* nil)
                (*compile-verbose* nil))

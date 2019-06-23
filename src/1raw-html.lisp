@@ -12,3 +12,17 @@
         (write-string text *output-stream*))))
 
 (export 'raw-text-node)
+
+
+(in-package :eazy-documentation)
+
+(defun convert-file-to-html-string (file)
+  (uiop:with-temporary-file (:pathname p :type "html")
+    (uiop:run-program
+     (format nil "pandoc -o ~a ~a" p file))
+    (read-file-into-string p)))
+
+(defun convert-string-to-html-string (string markup)
+  (uiop:with-temporary-file (:pathname p :type markup)
+    (write-string-into-file string p :if-exists :supersede)
+    (convert-file-to-html-string p)))

@@ -28,6 +28,7 @@
                              (remote-root nil)
                              (local-root nil)
                              (static-files nil)
+                             (markup "org")
                              &allow-other-keys)
     "The list of keyword argument list shared by several functions.")
   (defparameter +ignore+
@@ -102,7 +103,7 @@
   (setf defs (process-black-white-list defs blacklist whitelist external-only))
   (let ((doc (make-document title))
         (main (apply #'generate-commondoc-main defs args)))
-    (common-doc.split-paragraphs:split-paragraphs main)
+    ;; (common-doc.split-paragraphs:split-paragraphs main)
     (push main (children doc))
     (when toc
       (common-doc.ops:fill-unique-refs doc)
@@ -146,7 +147,7 @@
 
              ;; make a new section when the new def should not be grouped
              (when (not compatible)
-               (push (make-section-from-similar-defs (reverse tmp-defs) pmode)
+               (push (make-section-from-similar-defs (reverse tmp-defs) pmode markup)
                      tmp-file-sections)
                (setf tmp-defs nil))
 
@@ -200,7 +201,7 @@
         (finally
          (when tmp-defs
            (push
-            (make-section-from-similar-defs (reverse tmp-defs) mode)
+            (make-section-from-similar-defs (reverse tmp-defs) mode markup)
             tmp-file-sections))
          (when tmp-file-sections
            (push
@@ -233,8 +234,12 @@
              :reference (string string)))
 
 (defun par (string &rest classes)
-  (make-content (list (make-text (string string)))
-                :metadata (apply #'classes classes)))
+  (make-content
+   (list
+    (make-instance
+     'common-html.emitter:raw-text-node ; see 1raw-html.lisp
+     :text string))
+   :metadata (apply #'classes classes)))
 
 (defun div (element-or-elements &rest args)
   (apply #'make-content
@@ -253,7 +258,7 @@
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
-(defun make-section-from-similar-defs (defs mode)
+(defun make-section-from-similar-defs (defs mode markup)
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (ecase mode
       (:same-doctype
@@ -272,7 +277,7 @@
                  (print-args (first defs))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
-                      (par doc "docstring")
+                      (par (convert-string-to-html-string doc markup) "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
       (:same-name
@@ -290,7 +295,7 @@
            (print-args (first defs))))
          :children (list+
                     (if-let ((doc (ignore-errors (docstring (first defs)))))
-                      (par doc "docstring")
+                      (par (convert-string-to-html-string doc markup) "docstring")
                       (par "(documentation missing)" "docstring" "missing"))))
         :metadata (classes "entry")))
       ((nil)
@@ -308,15 +313,11 @@
                  (print-args def)))
                :children
                (list+
-                (if-let ((docstring (ignore-errors (docstring def))))
-                  (par docstring "docstring")
+                (if-let ((doc (ignore-errors (docstring def))))
+                  (par (convert-string-to-html-string doc markup) "docstring")
                   (par "(documentation missing)" "docstring" "missing"))))
               ;; process the static file
-              (make-content
-               (list
-                (make-instance
-                 'common-html.emitter:raw-text-node ; see 1raw-html.lisp
-                 :text (docstring def)))))
+              (par (convert-file-to-html-string (file def)) "static-file"))
           :metadata (classes "entry")))))))
 
 (defun table-of-contents (doc-or-node &key max-depth)
