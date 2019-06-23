@@ -38,6 +38,12 @@ Advantages over the existing libraries:
   and the documentation generator should respect this structure.
   This decision directly comes from quickdocs.
 
++ It minimizes the clutter in the auto-generateded output by detecting and
+  grouping the similar documentation entries. For example,
+  Functions with the same lambda-list and docstrings, variables with the same docstrings,
+  any def-something macro entries with the same name and missing documentations,
+  are grouped together.
+
 + The output is a common-doc object. Easily pluggable to the existing emitter
   supportd for common-doc objects.
 
