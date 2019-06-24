@@ -269,9 +269,24 @@ Options:
             tmp-doc-entries))
          (when tmp-doc-entries
            (push
-            (make-section (make-text
-                           (pathname-name pfile)
-                           :metadata (classes "file"))
+            
+            (make-section (list+ (make-text
+                                  (ignore-errors (pathname-name pfile))
+                                  :metadata (classes "file"))
+                                 (make-text
+                                  (ignore-errors (pathname-type pfile))
+                                  :metadata (classes "extension"))
+                                 
+                                 (when pfile
+                                   (if (and remote-root local-root)
+                                       (make-web-link
+                                        (remote-pathname pfile local-root remote-root)
+                                        (list (span "[edit on web]"))
+                                        :metadata (classes "source-link"))
+                                       (make-web-link
+                                        (format nil "file://~a" (namestring pfile))
+                                        (list (span "[source]"))
+                                        :metadata (classes "source-link")))))
                           :children (reverse tmp-doc-entries))
             tmp-file-sections))
          (when tmp-file-sections
