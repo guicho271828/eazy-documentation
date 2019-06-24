@@ -65,7 +65,6 @@ Advantages over the existing libraries:
    #:generate-commondoc-from-system
    #:generate-html-from-file
    #:generate-html-from-system
-   #:+doc+
    #:convert-file-to-html-string
    #:convert-string-to-html-string
    #:convert-file-to-ascii-string

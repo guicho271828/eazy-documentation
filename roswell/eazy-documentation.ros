@@ -8,9 +8,7 @@ exec ros -Q -- $0 "$@"
   #+quicklisp(ql:quickload '(:eazy-documentation :trivia) :silent t)
   )
 
-(defpackage :ros.script.eazy-documentation.3770268472
-  (:use :cl :trivia :eazy-documentation))
-(in-package :ros.script.eazy-documentation.3770268472)
+(in-package :eazy-documentation)
 
 (defun main (&rest argv)
   (declare (ignorable argv))
@@ -29,5 +27,5 @@ exec ros -Q -- $0 "$@"
              ~%~
              ~% Options are specified as follows:~
              ~%~
-             ~a" #.(convert-string-to-ascii-string +doc+ "md")))))
+             ~a" #.(convert-string-to-ascii-string eazy-documentation::+doc+ "md")))))
 ;;; vim: set ft=lisp lisp:
