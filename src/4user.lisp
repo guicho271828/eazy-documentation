@@ -35,7 +35,7 @@
                            (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
                                              :output :lines))
                          (ignore-errors
-                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
+                           (uiop:run-program (format nil "find ~adoc/ -name \"*.*\" -type f" dir)
                                              :output :lines)))))
         (setf (getf args :static-files) (sort lines #'string<)))))
   args)
