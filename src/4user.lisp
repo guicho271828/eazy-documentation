@@ -1,5 +1,6 @@
 (in-package :eazy-documentation)
 
+(defvar *target-pathname*)
 (defvar *supported-extensions*
   '("text" "txt" "texi" "man" "docx" "epub" "md" "markdown" "tex"
     "texinfo" "wiki" "mediawiki" "org" "odt" "opml" "rst" "textile")
@@ -107,26 +108,26 @@
          (node (apply #'generate-commondoc defs args)))
     node))
 
-(defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
+(defun generate-html-from-file (file *target-pathname* &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
   (let* ((args (apply #'augment-args-from-file        file args))
          (defs (apply #'extract-definitions-from-file file args))
          (node (apply #'generate-commondoc defs args)))
-    (apply #'render-html node pathname args)))
+    (apply #'render-html node *target-pathname* args)))
 
-(defun generate-html-from-system (system pathname &rest args &key . #.+keywords+)
+(defun generate-html-from-system (system *target-pathname* &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
   (let* ((args (apply #'augment-args-from-system        system args))
          (defs (apply #'extract-definitions-from-system system args))
          (node (apply #'generate-commondoc defs args)))
-    (apply #'render-html node pathname args)))
+    (apply #'render-html node *target-pathname* args)))
 
-(defun generate-html (file-or-system pathname &rest args &key . #.+keywords+)
+(defun generate-html (file-or-system *target-pathname* &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
   (if (and (typep file-or-system '(or string pathname))
            (probe-file file-or-system))
-      (apply #'generate-html-from-file   file-or-system pathname args)
-      (apply #'generate-html-from-system file-or-system pathname args)))
+      (apply #'generate-html-from-file   file-or-system *target-pathname* args)
+      (apply #'generate-html-from-system file-or-system *target-pathname* args)))
