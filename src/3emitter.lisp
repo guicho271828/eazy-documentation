@@ -16,6 +16,8 @@
 (defun generate-html (node pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
+  (when relative 
+    (setf pathname (merge-pathnames pathname *local-root*)))
   (ensure-directories-exist pathname)
   (if (member (pathname-type pathname) '("html" "htm") :test 'string-equal)
       ;; single file

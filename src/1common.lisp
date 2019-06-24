@@ -18,6 +18,7 @@
                            (clean nil)
                            ((:remote-root *remote-root*) nil)
                            ((:local-root *local-root*) nil)
+                           (relative nil)
                            (static-files nil)
                            (markup "md")
                            &allow-other-keys)
@@ -48,6 +49,7 @@ Options:
 |-------------------+-----------------------------------------------------------------------|
 | =:remote-root=    | Used to generate a weblink. Example: https://github.com/<name>/<proj> |
 | =:local-root=     | Used to generate a weblink. Example: /home/<user>/lisp/<proj>         |
+| =:relative=       | When non-nil, the output is relative to the value of local-root.      |
 | =:static-files=   | List of static README files etc.                                      |
 |-------------------+-----------------------------------------------------------------------|
 " )
