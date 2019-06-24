@@ -20,7 +20,7 @@
                            ((:local-root *local-root*) nil)
                            (relative nil)
                            (static-files nil)
-                           (markup "md")
+                           (markup "gfm")
                            &allow-other-keys)
   "The list of keyword argument list shared by several functions.")
 
