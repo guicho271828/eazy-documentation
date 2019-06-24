@@ -1,5 +1,10 @@
 (in-package :eazy-documentation)
 
+(defvar *supported-extensions*
+  '("text" "txt" "texi" "man" "docx" "epub" "md" "markdown" "tex"
+    "texinfo" "wiki" "mediawiki" "org" "odt" "opml" "rst" "textile")
+  "the list of supported extensions scraped by eazy-documentation")
+
 (defun augment-args-from-file (file &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -32,11 +37,15 @@
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
       (when-let ((lines (append
                          (ignore-errors
-                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
-                                             :output :lines))
+                           (uiop:run-program
+                            (format nil "find ~a -name \"README*\" -type f" dir)
+                            :output :lines))
                          (ignore-errors
-                           (uiop:run-program (format nil "find ~adoc/ -name \"*.*\" -type f" dir)
-                                             :output :lines)))))
+                           (uiop:run-program
+                            (format nil "find ~adoc/ ~{-name \"*.~a\"~^ -or ~}"
+                                    dir
+                                    *supported-extensions*)
+                            :output :lines)))))
         (setf (getf args :static-files) (sort lines #'string<)))))
   args)
 
