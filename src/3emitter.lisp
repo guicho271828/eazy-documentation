@@ -212,10 +212,12 @@
             tmp-file-sections))
          (when tmp-file-sections
            (push
-            (make-section (make-text
-                           (lastcar (pathname-directory pfile))
-                           :metadata (classes "directory"))
-                          :children (reverse tmp-file-sections))
+            (let ((dirname
+                   (namestring
+                    (dirname (local-enough-namestring pfile)))))
+              (make-section (make-text dirname :metadata (classes "directory"))
+                            :children (reverse tmp-file-sections)
+                            :reference dirname))
             tmp-dir-sections))
 
          (return (div (reverse tmp-dir-sections) :metadata (classes "main"))))))
