@@ -142,13 +142,16 @@
              (when (not (equal file pfile))
                (push
                 (make-section (make-content
-                               (list+ (make-text
-                                       (ignore-errors (pathname-name pfile))
-                                       :metadata (classes "file"))
-                                      (make-text
-                                       (ignore-errors (pathname-type pfile))
-                                       :metadata (classes "extension"))
-                                      
+                               (list+ (ignore-errors
+                                        (make-text
+                                         (or (pathname-name pfile)
+                                             (error "skip"))
+                                         :metadata (classes "file")))
+                                      (ignore-errors
+                                        (make-text
+                                         (or (pathname-type pfile)
+                                             (error "skip"))
+                                         :metadata (classes "extension")))
                                       (when pfile
                                         (make-web-link
                                          (remote-enough-namestring pfile)
@@ -187,13 +190,16 @@
             tmp-doc-entries))
          (when tmp-doc-entries
            (push
-            (make-section (list+ (make-text
-                                  (ignore-errors (pathname-name pfile))
-                                  :metadata (classes "file"))
-                                 (make-text
-                                  (ignore-errors (pathname-type pfile))
-                                  :metadata (classes "extension"))
-                                 
+            (make-section (list+ (ignore-errors
+                                   (make-text
+                                    (or (pathname-name pfile)
+                                        (error "skip"))
+                                    :metadata (classes "file")))
+                                 (ignore-errors
+                                   (make-text
+                                    (or (pathname-type pfile)
+                                        (error "skip"))
+                                    :metadata (classes "extension")))
                                  (when pfile
                                    (make-web-link
                                     (remote-enough-namestring pfile)
