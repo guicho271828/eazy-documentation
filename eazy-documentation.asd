@@ -22,6 +22,7 @@
  :pathname "src/"
  :serial t
  :components ((:file "0package")
+              (:file "1common")
               (:file "1definition")
               (:file "1raw-html")
               (:file "2extractor")
