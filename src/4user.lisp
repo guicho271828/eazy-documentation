@@ -128,6 +128,7 @@
   #.+doc+
   #.+ignore+
   (if (and (typep file-or-system '(or string pathname))
-           (probe-file file-or-system))
+           (probe-file file-or-system)
+           (string-equal "lisp" (pathname-type file-or-system)))
       (apply #'generate-html-from-file   file-or-system *target-pathname* args)
       (apply #'generate-html-from-system file-or-system *target-pathname* args)))
