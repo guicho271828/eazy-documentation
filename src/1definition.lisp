@@ -42,35 +42,24 @@
      (let ((name    (eq n1 n2))
            (doctype (eq d1 d2))
            (file    (equal f1 f2))
-           (s1b (slot-boundp a 'docstring))
-           (s2b (slot-boundp b 'docstring))
-           (a1b (slot-boundp a 'args))
-           (a2b (slot-boundp b 'args))   ;note: this is not let*
+           (a1 (slot-boundp a 'args))
+           (a2 (slot-boundp b 'args))   ;note: this is not let*
            (args (equal (ignore-errors a1) (ignore-errors a2)))
            (string (equal (ignore-errors s1) (ignore-errors s2))))
-       (when file
+       (when (and file string)
          ;; (break "~@{~a ~}" a b)
          (cond
            ;; different name, but same docstring, args, package
            ((and doctype
-                 string
                  (eq (symbol-package n1) ; same package
                      (symbol-package n2))
-                 (or (and a1b a2b args)
-                     (and (not a1b) (not a2b))))
+                 (or (and a1 a2 args)
+                     (and (not a1) (not a2))))
             (values t :same-doctype))
            ;; different doctype, but same docstring, args
            ((and name
-                 (or string
-                     (and s1b (not s2b)))
-                 (or (and a1b a2b args)
-                     (and (not a1b) (not a2b))))
-
-            ;; special rule; if the doc matches this rule,
-            ;; set the same docstring to the latter.
-            ;; Now this rule becomes equivalent to just comparing the string.
-            (when (and s1b (not s2b))
-              (setf s2 s1))
+                 (or (and a1 a2 args)
+                     (and (not a1) (not a2))))
             (values t :same-name))))))))
 
 (defun def~doc (a b)
@@ -80,15 +69,15 @@
     (((def :docstring (place s1) :file f1)
       (def :docstring (place s2) :file f2))
      (let ((file (equal f1 f2))
-           (s1b (slot-boundp a 'docstring))
-           (s2b (slot-boundp b 'docstring))
+           (s1 (slot-boundp a 'docstring))
+           (s2 (slot-boundp b 'docstring))
            (string (equal (ignore-errors s1) (ignore-errors s2))))
        (when file
          (cond
            ;; different name, but same docstring, args, package
-           ((and s1b s2b string)
+           ((and s1 s2 string)
             (values t :same-docstring))
-           ((and (not s1b) (not s2b))
+           ((and (not s1) (not s2))
             (values t :missing-docstring))))))))
 
 (defun left (a b) (declare (ignore b)) a)
