@@ -1,5 +1,8 @@
 (in-package :eazy-documentation)
 
+(defvar *remote-root*)
+(defvar *local-root*)
+
 (defparameter +keywords+ '((title "(no title)" title-supplied-p)
                            (header "")
                            (footer "")
@@ -13,10 +16,10 @@
                            (js-list  *default-js*)
                            (font-list  *default-fonts*)
                            (clean nil)
-                           (remote-root nil)
-                           (local-root nil)
+                           ((:remote-root *remote-root*) nil)
+                           ((:local-root *local-root*) nil)
                            (static-files nil)
-                           (markup "org")
+                           (markup "md")
                            &allow-other-keys)
   "The list of keyword argument list shared by several functions.")
 
@@ -49,10 +52,14 @@ Options:
 |-------------------+-----------------------------------------------------------------------|
 " )
 
+(defun parse-key-arg (arg)
+  (match arg
+    ((list* (list _ (and name (type symbol))) _) name)
+    ((list* (and name (type symbol)) _) name)))
+
 (defparameter +ignore+
-  `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))
-                       ,@(remove nil (mapcar #'third (butlast +keywords+))))
-            (special local-root remote-root))
+  `(declare (ignorable ,@(mapcar #'parse-key-arg (butlast +keywords+))
+                       ,@(remove nil (mapcar #'third (butlast +keywords+)))))
   "Declare statement that says ignorable for the keyword arguments in +keywords+.")
 
 
@@ -84,11 +91,9 @@ use uiop:pathname-directory-pathanme when you need path/to/dir/
       (copy-file src dst :if-to-exists (if force :supersede :error)))))
 
 (defun local-enough-namestring (file)
-  (declare (special local-root))
-  (enough-namestring file local-root))
+  (enough-namestring file *local-root*))
 
 (defun remote-enough-namestring (file)
-  (declare (special remote-root))
-  (format nil "~a~a" remote-root (local-enough-namestring file)))
+  (format nil "~a~a" *remote-root* (local-enough-namestring file)))
 
 

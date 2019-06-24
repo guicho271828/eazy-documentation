@@ -1,5 +1,45 @@
 (in-package :eazy-documentation)
 
+(defun augment-args-from-file (file &rest args &key . #.+keywords+)
+  #.+doc+
+  #.+ignore+
+  (when (not title-supplied-p)
+    (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
+  (when (not *local-root*)
+    (setf (getf args :local-root)
+          (uiop:pathname-directory-pathname file)))
+  (when (not *remote-root*)
+    (setf (getf args :remote-root)
+          (format nil "file://~a" (getf args :local-root))))
+  args)
+
+(defun augment-args-from-system (system &rest args &key . #.+keywords+)
+  #.+doc+
+  #.+ignore+
+  (when (not title-supplied-p)
+    (setf (getf args :title) (format nil "~a" system)))
+  (when (not *local-root*)
+    (setf (getf args :local-root)
+          (asdf:system-source-directory (asdf:find-system system))))
+  (when (not *remote-root*)
+    (setf (getf args :remote-root)
+          (if-let ((hp (asdf:system-homepage (asdf:find-system system))))
+            (if (search "https://github.com/" hp)
+                (format nil "~a/blob/master" hp)
+                hp)
+            (format nil "file://~a" (getf args :local-root)))))
+  (when (not static-files)
+    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
+      (when-let ((lines (append
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
+                                             :output :lines))
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
+                                             :output :lines)))))
+        (setf (getf args :static-files) (sort lines #'string<)))))
+  args)
+
 (defun extract-definitions-from-file (file &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -45,63 +85,31 @@
 (defun generate-commondoc-from-file (file &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
-  (when (not local-root)
-    (setf (getf args :local-root)
-          (pathname-directory-pathname file)))
-  (when (not remote-root)
-    (setf (getf args :remote-root)
-          (format nil "file://~a" local-root)))
-  (apply #'generate-commondoc
-         (extract-definitions-from-file file)
-         args))
+  (let* ((args (apply #'augment-args-from-file file args))
+         (defs (apply #'extract-definitions-from-file file args))
+         (node (apply #'generate-commondoc defs args)))
+    node))
 
 (defun generate-commondoc-from-system (system &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~a" system)))
-  (when (not local-root)
-    (setf (getf args :local-root)
-          (asdf:system-source-directory (asdf:find-system system))))
-  (when (not remote-root)
-    (setf (getf args :remote-root)
-          (if-let ((hp (asdf:system-homepage (asdf:find-system system))))
-            (if (search "https://github.com/" hp)
-                (format nil "~a/blob/master" hp)
-                hp)
-            (format nil "file://~a" local-root))))
-  (when (not static-files)
-    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (append
-                         (ignore-errors
-                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
-                                             :output :lines))
-                         (ignore-errors
-                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
-                                             :output :lines)))))
-        (setf (getf args :static-files) (sort lines #'string<)))))
-  (apply #'generate-commondoc
-         (extract-definitions-from-system system)
-         args))
+  (let* ((args (apply #'augment-args-from-system system args))
+         (defs (apply #'extract-definitions-from-system system args))
+         (node (apply #'generate-commondoc defs args)))
+    node))
 
 (defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (apply #'generate-html
-         (extract-definitions-from-file file)
-         pathname
-         args))
+  (let* ((args (apply #'augment-args-from-file        file args))
+         (defs (apply #'extract-definitions-from-file file args))
+         (node (apply #'generate-commondoc defs args)))
+    (apply #'generate-html node pathname args)))
 
-(defun generate-html-from-system (system pathname &rest args &key loop . #.+keywords+)
+(defun generate-html-from-system (system pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (let ((defs (extract-definitions-from-system system)))
-    (if loop
-        (loop
-           (apply #'generate-html defs pathname args)
-           (break))
-        (apply #'generate-html defs pathname args))))
-
-
+  (let* ((args (apply #'augment-args-from-system        system args))
+         (defs (apply #'extract-definitions-from-system system args))
+         (node (apply #'generate-commondoc defs args)))
+    (apply #'generate-html node pathname args)))

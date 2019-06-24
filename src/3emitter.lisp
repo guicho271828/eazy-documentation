@@ -13,37 +13,36 @@
   (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js"))
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
-(defun generate-html (defs pathname &rest args &key . #.+keywords+)
+(defun generate-html (node pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (let ((node (apply #'generate-commondoc defs args)))
-    (ensure-directories-exist pathname)
-    (if (member (pathname-type pathname) '("html" "htm") :test 'string-equal)
-        ;; single file
-        (let* ((directory (pathname-directory-pathname pathname))
-               (common-html.template:*template*
-                (apply #'make-instance template-class
-                       :css-list (mapcar #'basename css-list)
-                       :js-list (mapcar #'basename js-list)
-                       :allow-other-keys t args)))
-          (dolist (src (append css-list js-list))
-            (copy-to-dir src directory clean))
-          (with-open-file (s pathname
-                             :direction :output
-                             :if-exists :supersede
-                             :if-does-not-exist :create)
-            (common-html.emitter:node-to-stream node s)))
-        ;; multi file
-        (let* ((directory (uiop:ensure-directory-pathname pathname))
-               (common-html.template:*template*
-                (apply #'make-instance template-class
-                       :css-list (mapcar #'basename css-list)
-                       :js-list (mapcar #'basename js-list)
-                       :allow-other-keys t args)))
-          (dolist (src (append css-list js-list))
-            (copy-to-dir src directory clean))
-          (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
-    pathname))
+  (ensure-directories-exist pathname)
+  (if (member (pathname-type pathname) '("html" "htm") :test 'string-equal)
+      ;; single file
+      (let* ((directory (uiop:pathname-directory-pathname pathname))
+             (common-html.template:*template*
+              (apply #'make-instance template-class
+                     :css-list (mapcar #'basename css-list)
+                     :js-list (mapcar #'basename js-list)
+                     :allow-other-keys t args)))
+        (dolist (src (append css-list js-list))
+          (copy-to-dir src directory clean))
+        (with-open-file (s pathname
+                           :direction :output
+                           :if-exists :supersede
+                           :if-does-not-exist :create)
+          (common-html.emitter:node-to-stream node s)))
+      ;; multi file
+      (let* ((directory (uiop:ensure-directory-pathname pathname))
+             (common-html.template:*template*
+              (apply #'make-instance template-class
+                     :css-list (mapcar #'basename css-list)
+                     :js-list (mapcar #'basename js-list)
+                     :allow-other-keys t args)))
+        (dolist (src (append css-list js-list))
+          (copy-to-dir src directory clean))
+        (common-html.multi-emit:multi-emit node directory :max-depth max-depth)))
+  pathname)
 
 (defun process-black-white-list (defs blacklist whitelist external-only)
   (setf blacklist (mapcar #'find-package blacklist))
@@ -151,7 +150,7 @@
                                       (when pfile
                                         (make-web-link
                                          (remote-enough-namestring pfile)
-                                         (if (and remote-root local-root)
+                                         (if (search "http" *remote-root*)
                                              (list (span "[edit on web]"))
                                              (list (span "[source]")))
                                          :metadata (classes "source-link")))))
@@ -194,15 +193,12 @@
                                   :metadata (classes "extension"))
                                  
                                  (when pfile
-                                   (if (and remote-root local-root)
-                                       (make-web-link
-                                        (remote-enough-namestring pfile)
+                                   (make-web-link
+                                    (remote-enough-namestring pfile)
+                                    (if (search "http" *remote-root*)
                                         (list (span "[edit on web]"))
-                                        :metadata (classes "source-link"))
-                                       (make-web-link
-                                        (format nil "file://~a" (namestring pfile))
-                                        (list (span "[source]"))
-                                        :metadata (classes "source-link")))))
+                                        (list (span "[source]")))
+                                    :metadata (classes "source-link"))))
                           :children (reverse tmp-doc-entries)
                           :reference (local-enough-namestring pfile))
             tmp-file-sections))
