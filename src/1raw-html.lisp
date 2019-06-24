@@ -23,9 +23,12 @@
     (read-file-into-string p)))
 
 (defun convert-string-to-html-string (string markup)
-  (uiop:with-temporary-file (:pathname p :type markup)
-    (write-string-into-file string p :if-exists :supersede)
-    (convert-file-to-html-string p)))
+  (uiop:with-temporary-file (:pathname pin)
+    (write-string-into-file string pin :if-exists :supersede)
+    (uiop:with-temporary-file (:pathname pout :type "html")
+      (uiop:run-program
+       (format nil "pandoc -f ~a -o ~a ~a" markup pout pin))
+      (read-file-into-string pout))))
 
 (defun convert-file-to-ascii-string (file)
   (uiop:with-temporary-file (:pathname p :type "txt")
