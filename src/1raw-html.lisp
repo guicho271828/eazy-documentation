@@ -16,30 +16,55 @@
 
 (in-package :eazy-documentation)
 
-(defun convert-file-to-html-string (file)
-  (uiop:with-temporary-file (:pathname p :type "html")
-    (uiop:run-program
-     (format nil "pandoc -o ~a ~a" p file))
-    (read-file-into-string p)))
+(defun convert-file-to-html-string (pin)
+  (uiop:with-temporary-file (:pathname pout :type "html")
+    (handler-case
+        (progn
+          (uiop:run-program
+           (format nil "pandoc -o ~a ~a" pout pin)
+           :output t
+           :error-output t)
+          (read-file-into-string pout))
+      (uiop:subprocess-error ()
+        (read-file-into-string pin)))))
 
 (defun convert-string-to-html-string (string markup)
   (uiop:with-temporary-file (:pathname pin)
     (write-string-into-file string pin :if-exists :supersede)
     (uiop:with-temporary-file (:pathname pout :type "html")
-      (uiop:run-program
-       (format nil "pandoc -f ~a -o ~a ~a" markup pout pin))
-      (read-file-into-string pout))))
+      (handler-case
+          (progn
+            (uiop:run-program
+             (format nil "pandoc -f ~a -o ~a ~a" markup pout pin)
+             :output t
+             :error-output t)
+            (read-file-into-string pout))
+        (uiop:subprocess-error ()
+          string)))))
 
-(defun convert-file-to-ascii-string (file)
-  (uiop:with-temporary-file (:pathname p :type "txt")
-    (uiop:run-program
-     (format nil "pandoc -o ~a ~a" p file))
-    (read-file-into-string p)))
+(defun convert-file-to-ascii-string (pin)
+  (uiop:with-temporary-file (:pathname pout :type "txt")
+    (handler-case
+        (progn
+          (uiop:run-program
+           (format nil "pandoc -o ~a ~a" pout pin)
+           :output t
+           :error-output t)
+          (read-file-into-string pout))
+      (uiop:subprocess-error ()
+        (read-file-into-string pin)))))
 
 (defun convert-string-to-ascii-string (string markup)
   (uiop:with-temporary-file (:pathname pin)
     (write-string-into-file string pin :if-exists :supersede)
     (uiop:with-temporary-file (:pathname pout :type "txt")
-      (uiop:run-program
-       (format nil "pandoc -f ~a -o ~a ~a" markup pout pin))
-      (read-file-into-string pout))))
+      (handler-case
+          (progn
+            (uiop:run-program
+             (format nil "pandoc -f ~a -o ~a ~a" markup pout pin)
+             :output t
+             :error-output t)
+            (read-file-into-string pout))
+        (uiop:subprocess-error ()
+          string)))))
+
