@@ -13,7 +13,7 @@
   (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js"))
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
-(defun generate-html (node pathname &rest args &key . #.+keywords+)
+(defun render-html (node pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
   (when relative 

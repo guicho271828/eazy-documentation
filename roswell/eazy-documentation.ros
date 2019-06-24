@@ -14,10 +14,8 @@ exec ros -Q -- $0 "$@"
   (declare (ignorable argv))
 
   (match argv
-    ((list* file-or-system output rest)
-     (if (probe-file file-or-system)
-         (apply #'generate-html-from-file   file-or-system output rest)
-         (apply #'generate-html-from-system file-or-system output rest)))
+    ((list* _ _ _)
+     (apply #'generate-html argv))
     (nil
      (format *error-output*
              "~&Usage: eazy-documentation file-or-system output [OPTIONS]~%~

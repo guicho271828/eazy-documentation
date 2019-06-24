@@ -28,8 +28,7 @@ a lisp source code.
 Advantages over the existing libraries:
 
 * EAZY-DOCUMENTATION can generate documents from a single file or an ASDF system.
-  Run `(eazy-documentation:generate-html-from-system <system-name> \"index.html\")` or
-  `(eazy-documentation:generate-html-from-file #p\"script.lisp\" \"index.html\")`.
+  Run `(eazy-documentation:generate-html <file-or-system> \"index.html\")`
   No additional quirks are necessary.
 
 * Extraction is heuristic and robust. It is easily automated and can handle
@@ -68,7 +67,8 @@ Advantages over the existing libraries:
    #:convert-file-to-html-string
    #:convert-string-to-html-string
    #:convert-file-to-ascii-string
-   #:convert-string-to-ascii-string))
+   #:convert-string-to-ascii-string
+   #:generate-html))
 
 (in-package :eazy-documentation)
 
