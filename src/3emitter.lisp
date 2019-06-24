@@ -13,6 +13,8 @@
   (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js"))
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
+(defvar *ids*)                    ; a hash table for entry IDs --- WIP
+
 (defun render-html (node pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -67,8 +69,9 @@
   #.+doc+
   #.+ignore+
   (setf defs (process-black-white-list defs blacklist whitelist external-only))
-  (let ((doc (make-document title))
-        (main (apply #'generate-commondoc-main defs args)))
+  (let* ((*ids* (make-hash-table))
+         (doc (make-document title))
+         (main (apply #'generate-commondoc-main defs args)))
     ;; (common-doc.split-paragraphs:split-paragraphs main)
     (push (div (make-text footer)
                :metadata (classes "footer"))
@@ -230,10 +233,15 @@
   (make-text (string string)
              :metadata (when classes (apply #'classes classes))))
 
-(defun span-id (string &rest classes)
-  (make-text (string string)
-             :metadata (when classes (apply #'classes classes))
-             :reference (string string)))
+(defun span-id (sym &rest classes)
+  (declare (symbol sym))
+  (let ((id (format nil "~a:~a"
+                    (package-name (symbol-package sym))
+                    (symbol-name sym))))
+    (setf (gethash sym *ids*) id)
+    (make-text (string-downcase sym)
+               :metadata (when classes (apply #'classes classes))
+               :reference id)))
 
 (defun par (string &rest classes)
   (make-content
@@ -274,7 +282,7 @@
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span-id (down (name def)) "name" (down (doctype def)))))
+                         (span-id (name def) "name" (down (doctype def)))))
                  (print-package (first defs)) 
                  (print-args (first defs))))))
        (:same-name
@@ -285,7 +293,7 @@
                          (collecting (span "," "sep2")))
                        (collecting (span (down (doctype def)) "doctype")))
                  (span ":" "sep1")
-                 (span-id (down (name (first defs))) "name")
+                 (span-id (name (first defs)) "name")
                  (print-package (first defs))
                  (print-args (first defs))))))
        ((nil)
@@ -297,7 +305,7 @@
                 (list+
                  (span (down (doctype def)) "doctype")
                  (span ":" "sep1")
-                 (span-id (down (name def)) "name")
+                 (span-id (name def) "name")
                  (print-package def)
                  (print-args def))))
               ;; process the static file
