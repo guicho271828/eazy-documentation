@@ -94,6 +94,9 @@ use uiop:pathname-directory-pathanme when you need path/to/dir/
   (enough-namestring file *local-root*))
 
 (defun remote-enough-namestring (file)
-  (format nil "~a~a" *remote-root* (local-enough-namestring file)))
+  (format nil "~a~:[/~;~]~a"
+          *remote-root*
+          (char= #\/ (last-elt *remote-root*))
+          (local-enough-namestring file)))
 
 
