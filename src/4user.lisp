@@ -1,6 +1,8 @@
 (in-package :eazy-documentation)
 
-(defun extract-definitions-from-file (file)
+(defun extract-definitions-from-file (file &key . #.+keywords+)
+  #.+doc+
+  #.+ignore+
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-definitions
      (lambda ()
@@ -12,17 +14,7 @@
 
 (defun extract-definitions-from-system (system &key . #.+keywords+)
   #.+doc+
-  #.+ignore+
-  (when (not static-files)
-    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (append
-                         (ignore-errors
-                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
-                                             :output :lines))
-                         (ignore-errors
-                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
-                                             :output :lines)))))
-        (setf static-files (sort lines #'string<)))))
+  #.+ignore+  
   (let ((*compile-print* nil)
         (*compile-verbose* nil))
     (asdf:load-system system))
@@ -55,6 +47,12 @@
   #.+ignore+
   (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
+  (when (not local-root)
+    (setf (getf args :local-root)
+          (pathname-directory-pathname file)))
+  (when (not remote-root)
+    (setf (getf args :remote-root)
+          (format nil "file://~a" local-root)))
   (apply #'generate-commondoc
          (extract-definitions-from-file file)
          args))
@@ -68,15 +66,22 @@
     (setf (getf args :local-root)
           (asdf:system-source-directory (asdf:find-system system))))
   (when (not remote-root)
-    (let ((hp (asdf:system-homepage (asdf:find-system system))))
-      (when (search "https://github.com/" hp)
-        (format nil "~a/blob/master" hp))))
+    (setf (getf args :remote-root)
+          (if-let ((hp (asdf:system-homepage (asdf:find-system system))))
+            (if (search "https://github.com/" hp)
+                (format nil "~a/blob/master" hp)
+                hp)
+            (format nil "file://~a" local-root))))
   (when (not static-files)
     (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
-                                          :output :lines)))
-        (setf (getf args :static-files)
-              lines))))
+      (when-let ((lines (append
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~a -name \"README*\" -type f" dir)
+                                             :output :lines))
+                         (ignore-errors
+                           (uiop:run-program (format nil "find ~adoc/ -type f" dir)
+                                             :output :lines)))))
+        (setf (getf args :static-files) (sort lines #'string<)))))
   (apply #'generate-commondoc
          (extract-definitions-from-system system)
          args))
@@ -84,8 +89,6 @@
 (defun generate-html-from-file (file pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
   (apply #'generate-html
          (extract-definitions-from-file file)
          pathname
@@ -94,24 +97,6 @@
 (defun generate-html-from-system (system pathname &rest args &key loop . #.+keywords+)
   #.+doc+
   #.+ignore+
-  (when (not title-supplied-p)
-    (setf (getf args :title) (format nil "~a" system)))
-  (when (not local-root)
-    (setf (getf args :local-root)
-          (asdf:system-source-directory (asdf:find-system system))))
-  (when (not remote-root)
-    (let ((hp (asdf:system-homepage (asdf:find-system system))))
-      (when (search "https://github.com/" hp)
-        (setf (getf args :remote-root)
-              (format nil "~a/blob/master" hp)))))
-
-  (when (not static-files)
-    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (uiop:run-program (format nil "find ~a -name \"README*\"" dir)
-                                          :output :lines)))
-        (setf (getf args :static-files)
-              lines))))
-  
   (let ((defs (extract-definitions-from-system system)))
     (if loop
         (loop
