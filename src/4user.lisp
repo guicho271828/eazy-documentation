@@ -23,7 +23,7 @@
      (lambda ()
        (dolist (file static-files)
          (ignore-errors
-           (add-def :name (make-keyword (namestring file))
+           (add-def :name (make-keyword (local-enough-namestring file))
                     :doctype 'static-file
                     :file file
                     :docstring (read-file-into-string file))))

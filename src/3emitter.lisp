@@ -13,21 +13,6 @@
   (list (asdf:system-relative-pathname :eazy-documentation "default/js/default.js"))
   "A list of JavaScript pathnames to be loaded in the html by default.")
 
-(defun copy-destination (src dir)
-  (make-pathname :name (pathname-name src)
-                 :type (pathname-type src)
-                 :directory (pathname-directory dir)))
-
-(defun copy-to-dir (src dir &optional force)
-  (let ((dst (copy-destination src dir)))
-    (ignore-errors
-      (copy-file src dst :if-to-exists (if force :supersede :error)))))
-
-(defun basename (pathname)
-  (make-pathname :name (pathname-name pathname)
-                 :type (pathname-type pathname)
-                 :directory nil))
-
 (defun generate-html (defs pathname &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -35,7 +20,7 @@
     (ensure-directories-exist pathname)
     (if (member (pathname-type pathname) '("html" "htm") :test 'string-equal)
         ;; single file
-        (let* ((directory (make-pathname :name nil :type nil :defaults pathname))
+        (let* ((directory (pathname-directory-pathname pathname))
                (common-html.template:*template*
                 (apply #'make-instance template-class
                        :css-list (mapcar #'basename css-list)
@@ -102,11 +87,6 @@
           (children doc))
     doc))
 
-(defun remote-pathname (file local-root remote-root)
-  (format nil "~a/~a"
-          remote-root
-          (uiop:enough-pathname file local-root)))
-
 (defun generate-commondoc-main (defs &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -169,17 +149,14 @@
                                        :metadata (classes "extension"))
                                       
                                       (when pfile
-                                        (if (and remote-root local-root)
-                                            (make-web-link
-                                             (remote-pathname pfile local-root remote-root)
+                                        (make-web-link
+                                         (remote-enough-namestring pfile)
+                                         (if (and remote-root local-root)
                                              (list (span "[edit on web]"))
-                                             :metadata (classes "source-link"))
-                                            (make-web-link
-                                             (format nil "file://~a" (namestring pfile))
-                                             (list (span "[source]"))
-                                             :metadata (classes "source-link"))))))
+                                             (list (span "[source]")))
+                                         :metadata (classes "source-link")))))
                               :children (reverse tmp-doc-entries)
-                              :reference (ignore-errors (pathname-name pfile)))
+                              :reference (local-enough-namestring pfile))
                 tmp-file-sections)
                (setf tmp-doc-entries nil))
              
@@ -188,15 +165,8 @@
                                (ignore-errors (pathname-directory pfile))))
                (push
                 (let ((dirname
-                       (if local-root
-                           (namestring
-                            (let ((dir (pathname-directory
-                                        (uiop:enough-pathname pfile local-root))))
-                              (make-pathname
-                               :name (lastcar dir)
-                               :type nil
-                               :directory (butlast dir))))
-                           (lastcar (ignore-errors (pathname-directory pfile))))))
+                       (namestring
+                        (dirname (local-enough-namestring pfile)))))
                   (make-section (make-text dirname :metadata (classes "directory"))
                                 :children (reverse tmp-file-sections)
                                 :reference dirname))
@@ -216,7 +186,6 @@
             tmp-doc-entries))
          (when tmp-doc-entries
            (push
-            
             (make-section (list+ (make-text
                                   (ignore-errors (pathname-name pfile))
                                   :metadata (classes "file"))
@@ -227,14 +196,15 @@
                                  (when pfile
                                    (if (and remote-root local-root)
                                        (make-web-link
-                                        (remote-pathname pfile local-root remote-root)
+                                        (remote-enough-namestring pfile)
                                         (list (span "[edit on web]"))
                                         :metadata (classes "source-link"))
                                        (make-web-link
                                         (format nil "file://~a" (namestring pfile))
                                         (list (span "[source]"))
                                         :metadata (classes "source-link")))))
-                          :children (reverse tmp-doc-entries))
+                          :children (reverse tmp-doc-entries)
+                          :reference (local-enough-namestring pfile))
             tmp-file-sections))
          (when tmp-file-sections
            (push

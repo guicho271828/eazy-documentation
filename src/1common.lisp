@@ -51,5 +51,44 @@ Options:
 
 (defparameter +ignore+
   `(declare (ignorable ,@(mapcar #'first (butlast +keywords+))
-                       ,@(remove nil (mapcar #'third (butlast +keywords+)))))
+                       ,@(remove nil (mapcar #'third (butlast +keywords+))))
+            (special local-root remote-root))
   "Declare statement that says ignorable for the keyword arguments in +keywords+.")
+
+
+(defun basename (pathname)
+  "path/to/dir/file -> file"
+  (make-pathname :name (pathname-name pathname)
+                 :type (pathname-type pathname)
+                 :directory nil))
+
+(defun dirname (pathname)
+  "path/to/dir/file -> path/to/dir
+
+use uiop:pathname-directory-pathanme when you need path/to/dir/
+"
+  (let ((dir (pathname-directory pathname)))
+    (make-pathname
+     :name (lastcar dir)
+     :type nil
+     :directory (butlast dir))))
+
+(defun copy-destination (src dir)
+  (make-pathname :name (pathname-name src)
+                 :type (pathname-type src)
+                 :directory (pathname-directory dir)))
+
+(defun copy-to-dir (src dir &optional force)
+  (let ((dst (copy-destination src dir)))
+    (ignore-errors
+      (copy-file src dst :if-to-exists (if force :supersede :error)))))
+
+(defun local-enough-namestring (file)
+  (declare (special local-root))
+  (enough-namestring file local-root))
+
+(defun remote-enough-namestring (file)
+  (declare (special remote-root))
+  (format nil "~a~a" remote-root (local-enough-namestring file)))
+
+
