@@ -29,5 +29,5 @@ exec ros -Q -- $0 "$@"
              ~%~
              ~% Options are specified as follows:~
              ~%~
-             ~a" #.(convert-string-to-ascii-string +doc+ "org")))))
+             ~a" #.(convert-string-to-ascii-string +doc+ "md")))))
 ;;; vim: set ft=lisp lisp:
