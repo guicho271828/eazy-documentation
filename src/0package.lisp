@@ -27,25 +27,35 @@ a lisp source code.
 
 Advantages over the existing libraries:
 
-+ It does not depend on ASDF. --- It can be combined with ASDF, but it is
-  not mandatory.
+* EAZY-DOCUMENTATION can generate documents from a single file or an ASDF system.
+  Run `(eazy-documentation:generate-html-from-system <system-name> \"index.html\")` or
+  `(eazy-documentation:generate-html-from-file #p\"script.lisp\" \"index.html\")`.
+  No additional quirks are necessary.
 
-+ Extraction is heuristic and robust. --- It is easily automated and can handle
-  unknown user-defined macro.
+* Extraction is heuristic and robust. It is easily automated and can handle
+  unknown user-defined macro whose name begins with DEF.
 
-+ It respects the file and directory structure. Well-written, maintainable
+* As per Quickdocs, it respects the file and directory structure. Well-written, maintainable
   libraries have a great readability in the source code. This should be respected
   and the documentation generator should respect this structure.
-  This decision directly comes from quickdocs.
 
-+ It minimizes the clutter in the auto-generateded output by detecting and
-  grouping the similar documentation entries. For example,
-  Functions with the same lambda-list and docstrings, variables with the same docstrings,
-  any def-something macro entries with the same name and missing documentations,
-  are grouped together.
+* It minimizes the clutter in the auto-generateded output by detecting and
+  grouping the similar documentation entries.
+  For example, these entries are grouped together:
+  
+  * Functions with the same lambda-list and docstrings.
+  * Variables with the same docstrings.
+  * Any DEF-something macro entries with the same name and missing documentations.
 
-+ The output is a common-doc object. Easily pluggable to the existing emitter
-  supportd for common-doc objects.
+* Typesetting and syntax highlighting of docstring is done by
+  [Pandoc](https://pandoc.org/) which supports a wide range of language and
+  format support.
+
+  Run `curl -sSL https://get.haskellstack.org/ | sh && stack install pandoc`
+  to install the latest Pandoc.
+
+* The output is a common-doc object, thus easily pluggable to the existing emitter
+  for them.
 
 ")
   (:export
