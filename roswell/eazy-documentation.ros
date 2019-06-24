@@ -14,8 +14,8 @@ exec ros -Q -- $0 "$@"
   (declare (ignorable argv))
 
   (match argv
-    ((list* _ _ _)
-     (apply #'generate-html argv))
+    ((list* file-or-system target rest)
+     (apply #'generate-html file-or-system target (mapcar #'read-from-string rest)))
     (nil
      (format *error-output*
              "~&Usage: eazy-documentation file-or-system output [OPTIONS]~%~
