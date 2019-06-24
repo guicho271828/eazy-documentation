@@ -295,12 +295,14 @@
      :metadata (classes "entry"))))
 
 (defun insert-docstring (def entry markup multi-p)
-  (push (if-let ((doc (ignore-errors (docstring def))))
-          (par (convert-string-to-html-string doc markup) "docstring")
-          (par (if multi-p
-                   "(all documentation missing)"
-                   "(documentation missing)")
-               "docstring" "missing"))
+  (push (if (eq 'static-file (doctype def))
+            (par (convert-file-to-html-string (file def)) "docstring")
+            (if-let ((doc (ignore-errors (docstring def))))
+              (par (convert-string-to-html-string doc markup) "docstring")
+              (par (if multi-p
+                       "(all documentation missing)"
+                       "(documentation missing)")
+                   "docstring" "missing")))
         (children (first (children entry)))))
 
 (defun make-doc-entry (entries def markup)
