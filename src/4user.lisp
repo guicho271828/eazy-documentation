@@ -22,7 +22,7 @@
                          (ignore-errors
                            (uiop:run-program (format nil "find ~adoc/ -type f" dir)
                                              :output :lines)))))
-        (setf static-files lines))))
+        (setf static-files (sort lines #'string<)))))
   (let ((*compile-print* nil)
         (*compile-verbose* nil))
     (asdf:load-system system))
