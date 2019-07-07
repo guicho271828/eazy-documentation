@@ -274,6 +274,22 @@
           (package-name
            (symbol-package name))))
 
+(defun symbol-status (sym)
+  (declare (symbol sym))
+  ;; :external or :internal.
+  (nth-value
+   1 (find-symbol
+      (symbol-name sym)
+      (symbol-package sym))))
+
+(defun entry-status (defs)
+  (if (find :external defs
+            :key (lambda (def) (symbol-status (name def))))
+      ;; if no :external is found, then
+      ;; the whole entry is also marked internal
+      :external
+      :internal))
+
 (defun make-entry (defs mode &aux (def (first defs)))
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (div
@@ -288,10 +304,13 @@
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span-id (name def) "name")))
+                         (span-id (name def) "name" (symbol-status (name def)))))
                  (print-package def) 
                  (print-args def))
-          :metadata (classes (symbol-package-name-class (name def))))))
+          ;; the entire entry is hidden based on the package and
+          ;; external/internal status
+          :metadata (classes (symbol-package-name-class (name def))
+                             (entry-status defs)))))
        (:same-name
         (make-section
          (div
@@ -303,7 +322,10 @@
                  (span-id (name def) "name")
                  (print-package def)
                  (print-args def))
-          :metadata (classes (symbol-package-name-class (name def))))))
+          ;; the entire entry is hidden based on the package and
+          ;; external/internal status
+          :metadata (classes (symbol-package-name-class (name def))
+                             (symbol-status (name def))))))
        ((nil)
         (assert (= 1 (length defs)))
         (if (not (eq 'static-file (doctype def))) 
@@ -314,7 +336,10 @@
                (span ":" "sep1")
                (span-id (name def) "name")
                (print-args def))
-              :metadata (classes (symbol-package-name-class (name def)))))
+              ;; the entire entry is hidden based on the package and
+              ;; external/internal status
+              :metadata (classes (symbol-package-name-class (name def))
+                                 (symbol-status (name def)))))
             ;; process the static file
             (make-content nil :metadata (classes "static-file")))))
      :metadata (classes "entry"))))
