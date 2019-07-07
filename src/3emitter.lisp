@@ -257,6 +257,11 @@
          (ensure-list element-or-elements)
          args))
 
+(defun fdiv (element-or-elements)
+  "force making a div -- make-content may omit them if it lacks classes"
+  (div element-or-elements
+       :metadata (classes "span")))
+
 (defun list+ (&rest args) (remove nil (flatten args)))
 
 (defun print-args (def)
@@ -297,14 +302,12 @@
        (:same-doctype
         (make-section
          (div
-          (list+ (span (down (doctype def)) "doctype")
-                 (span ":" "sep1")
-                 (iter (for def in defs)
-                       (unless (first-iteration-p)
-                         (collecting
-                           (span "," "sep2")))
-                       (collecting
-                         (span-id (name def) "name" (symbol-status (name def)))))
+          (list+ (fdiv
+                  (span (down (doctype def)) "doctype"))
+                 (fdiv
+                  (iter (for def in defs)
+                        (collecting
+                          (span-id (name def) "name" (symbol-status (name def))))))
                  (print-package def) 
                  (print-args def))
           ;; the entire entry is hidden based on the package and
@@ -314,12 +317,11 @@
        (:same-name
         (make-section
          (div
-          (list+ (iter (for def in defs)
-                       (unless (first-iteration-p)
-                         (collecting (span "," "sep2")))
-                       (collecting (span (down (doctype def)) "doctype")))
-                 (span ":" "sep1")
-                 (span-id (name def) "name")
+          (list+ (fdiv
+                  (iter (for def in defs)
+                        (collecting (span (down (doctype def)) "doctype"))))
+                 (fdiv
+                  (span-id (name def) "name"))
                  (print-package def)
                  (print-args def))
           ;; the entire entry is hidden based on the package and
@@ -332,9 +334,10 @@
             (make-section
              (div
               (list+
-               (span (down (doctype def)) "doctype")
-               (span ":" "sep1")
-               (span-id (name def) "name")
+               (fdiv
+                (span (down (doctype def)) "doctype"))
+               (fdiv
+                (span-id (name def) "name"))
                (print-args def))
               ;; the entire entry is hidden based on the package and
               ;; external/internal status
