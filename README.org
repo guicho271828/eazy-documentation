@@ -1,0 +1,35 @@
+* Eazy-Documentation [[https://travis-ci.org/numcl/numcl][https://travis-ci.org/eazy-documentation/eazy-documentation.svg]]
+
++ *One-shot solution to the CL library documentation generator.*
+  + It *does not require any custom macro/read-macro for annotating your API.*
+    Existing documentation generator supports only a limited number of macros,
+    or need user-defined extensions to the parser that extracts the
+    documentation strings.  In contrast, this library runs based on the heuristic
+    decision and ranking.
+  + It *searches the repository for any potential documentation files and embed*
+    *them in the output as html*. Some library (especially the old ones like CFFI)
+    contains a separate documentation / manual as texinfo documents, but they
+    are now all part of the output.
+  + It supports any markup format supported by Pandoc and makeinfo.
+
++ *Compress, compress, compress!*
+  + Best documentation gives you the largest amount of information with
+    the least read-time. Bloated, redundant entries are therefore harmful.
+    Eazy-Documentation compresses the documentation entries
+    in a run-length encoding manner -- similar, partly identical entries are merged together
+    as much as possible.
+
++ *Respect the code structure and ordering.*
+  + Well-written library has a nice, intuitive code structure.
+    This must be exploited by the documentation generator --
+    which was pointed out by @nitro_idiot .
+
+** Author, License, Copyright
+
+Masataro Asai (guicho2.71828@gmail.com)
+
+Licensed under LGPL v3.
+
+Copyright (c) 2019 IBM Corporation
+
+

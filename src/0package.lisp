@@ -22,7 +22,7 @@ NUMCL.  If not, see <http://www.gnu.org/licenses/>.
   (:use :cl :alexandria :trivia :iterate :common-doc)
   (:documentation
    "
-This package provides an easy-pezy way to extract documentations from
+This package provides an easy way to extract documentations from
 a lisp source code.
 
 Advantages over the existing libraries:

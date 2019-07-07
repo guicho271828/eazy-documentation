@@ -29,4 +29,4 @@
               (:file "3emitter")
               (:file "4user")
               (:file "5template"))
- :description "Heuristic documentation extraction library")
+ :description "One-shot solution to the CL documentation generator.")
