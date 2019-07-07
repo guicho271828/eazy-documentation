@@ -269,6 +269,11 @@
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
+(defun symbol-package-name-class (name)
+  (format nil "pkg-~a"
+          (package-name
+           (symbol-package name))))
+
 (defun make-entry (defs mode &aux (def (first defs)))
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (div
@@ -285,7 +290,8 @@
                        (collecting
                          (span-id (name def) "name" (down (doctype def)))))
                  (print-package def) 
-                 (print-args def)))))
+                 (print-args def))
+          :metadata (classes (symbol-package-name-class (name def))))))
        (:same-name
         (make-section
          (div
@@ -296,7 +302,8 @@
                  (span ":" "sep1")
                  (span-id (name def) "name")
                  (print-package def)
-                 (print-args def)))))
+                 (print-args def))
+          :metadata (classes (symbol-package-name-class (name def))))))
        ((nil)
         (assert (= 1 (length defs)))
         (if (not (eq 'static-file (doctype def))) 
@@ -306,7 +313,8 @@
                (span (down (doctype def)) "doctype")
                (span ":" "sep1")
                (span-id (name def) "name")
-               (print-args def))))
+               (print-args def))
+              :metadata (classes (symbol-package-name-class (name def)))))
             ;; process the static file
             (make-content nil :metadata (classes "static-file")))))
      :metadata (classes "entry"))))
