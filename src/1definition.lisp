@@ -25,8 +25,10 @@
        (when (slot-boundp def 'args)
          (format s " ~@{~s~^ ~}" :args a1))))))
 
+;; WARNING: def= must imply def~, and def~ must imply def~doc .
+
 (defun def= (a b)
-  "Compare the name and the doctype. Returns true when they are all EQ."
+  "Compare the name and the doctype. Returns true when they are both EQ."
   (ematch* (a b)
     (((def :doctype d1 :safe-name n1)
       (def :doctype d2 :safe-name n2))
@@ -34,7 +36,7 @@
           (eq n1 n2)))))
 
 (defun def~ (a b)
-  "Compare the name, doctype, docstring by EQ.
+  "Compare the name (and its package), doctype, file, args, docstring.
  Returns true when they look same according to a heuristic rule."
   (ematch* (a b)
     (((def :doctype d1 :safe-name n1 :file f1 :docstring (place s1) :args (place a1))
@@ -63,7 +65,7 @@
             (values t :same-name))))))))
 
 (defun def~doc (a b)
-  "Compare the docstring.
+  "Compare the file and docstring.
  Returns true when they are both missing or EQUAL."
   (ematch* (a b)
     (((def :docstring (place s1) :file f1)

@@ -234,6 +234,7 @@
              :metadata (when classes (apply #'classes classes))))
 
 (defun span-id (sym &rest classes)
+  "Create a span element with an id based on SYM."
   (declare (symbol sym))
   (let ((id (format nil "~a:~a"
                     (package-name (symbol-package sym))
