@@ -288,7 +288,7 @@
                          (collecting
                            (span "," "sep2")))
                        (collecting
-                         (span-id (name def) "name" (down (doctype def)))))
+                         (span-id (name def) "name")))
                  (print-package def) 
                  (print-args def))
           :metadata (classes (symbol-package-name-class (name def))))))
