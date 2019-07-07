@@ -269,14 +269,14 @@
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
-(defun make-entry (defs mode)
+(defun make-entry (defs mode &aux (def (first defs)))
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (div
      (ecase mode
        (:same-doctype
         (make-section
          (div
-          (list+ (span (down (doctype (first defs))) "doctype")
+          (list+ (span (down (doctype def)) "doctype")
                  (span ":" "sep1")
                  (iter (for def in defs)
                        (unless (first-iteration-p)
@@ -284,8 +284,8 @@
                            (span "," "sep2")))
                        (collecting
                          (span-id (name def) "name" (down (doctype def)))))
-                 (print-package (first defs)) 
-                 (print-args (first defs))))))
+                 (print-package def) 
+                 (print-args def)))))
        (:same-name
         (make-section
          (div
@@ -294,23 +294,21 @@
                          (collecting (span "," "sep2")))
                        (collecting (span (down (doctype def)) "doctype")))
                  (span ":" "sep1")
-                 (span-id (name (first defs)) "name")
-                 (print-package (first defs))
-                 (print-args (first defs))))))
-       ((nil)
-        (assert (= 1 (length defs)))
-        (let ((def (first defs)))
-          (if (not (eq 'static-file (doctype def))) 
-              (make-section
-               (div
-                (list+
-                 (span (down (doctype def)) "doctype")
-                 (span ":" "sep1")
                  (span-id (name def) "name")
                  (print-package def)
-                 (print-args def))))
-              ;; process the static file
-              (make-content nil :metadata (classes "static-file"))))))
+                 (print-args def)))))
+       ((nil)
+        (assert (= 1 (length defs)))
+        (if (not (eq 'static-file (doctype def))) 
+            (make-section
+             (div
+              (list+
+               (span (down (doctype def)) "doctype")
+               (span ":" "sep1")
+               (span-id (name def) "name")
+               (print-args def))))
+            ;; process the static file
+            (make-content nil :metadata (classes "static-file")))))
      :metadata (classes "entry"))))
 
 (defun insert-docstring (def entry markup multi-p)
