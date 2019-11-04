@@ -19,7 +19,7 @@
      (finish-output *error-output*)
      (finish-output *trace-output*)
      (finish-output *standard-output*)
-     (format t "~&Done!~%"))
+     (format t "~%Done!~%"))
     (nil
      (format *error-output*
              "~&Usage: eazy-documentation file-or-system output [OPTIONS]~%~
