@@ -16,6 +16,9 @@
      #+sbcl
      (proclaim '(sb-ext:muffle-conditions sb-ext:compiler-note style-warning))
      (apply #'generate-html file-or-system target (mapcar #'read-from-string rest))
+     (finish-output *error-output*)
+     (finish-output *trace-output*)
+     (finish-output *standard-output*)
      (format t "~&Done!~%"))
     (nil
      (format *error-output*
