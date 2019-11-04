@@ -13,6 +13,8 @@
       (roswell:quit 1)))
   (match argv
     ((list* file-or-system target rest)
+     #+sbcl
+     (proclaim '(sb-ext:muffle-conditions sb-ext:compiler-note))
      (apply #'generate-html file-or-system target (mapcar #'read-from-string rest)))
     (nil
      (format *error-output*
