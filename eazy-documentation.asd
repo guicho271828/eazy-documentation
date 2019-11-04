@@ -28,5 +28,6 @@
               (:file "2extractor")
               (:file "3emitter")
               (:file "4user")
-              (:file "5template"))
+              (:file "5template")
+              (:file "6main"))
  :description "One-shot solution to the CL documentation generator.")

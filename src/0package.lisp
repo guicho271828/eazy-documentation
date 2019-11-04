@@ -68,7 +68,8 @@ Advantages over the existing libraries:
    #:convert-string-to-html-string
    #:convert-file-to-ascii-string
    #:convert-string-to-ascii-string
-   #:generate-html))
+   #:generate-html
+   #:main))
 
 (in-package :eazy-documentation)
 
