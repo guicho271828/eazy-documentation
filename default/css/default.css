@@ -141,7 +141,8 @@ a {
 .name:first-child:before {
   content: ":";
   margin-left: 0.1em;
-  margin-right: 0.1em; }
+  margin-right: 0.1em;
+  color: gray; }
 .name:before {
   content: ",";
   margin-right: 0.3em; }
