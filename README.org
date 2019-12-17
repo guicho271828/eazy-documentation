@@ -14,8 +14,8 @@
 
 + *Compress, compress, compress!*
   + *Best documentation gives you the most with the least text.*
-    Bloated, redundant entries are therefore harmful.
-    Eazy-Documentation compresses the documentation entries
+    Bloated, redundant entries are harmful.
+    Eazy-Documentation therefore provides a compact documentation by compressing the documentation entries
     in a run-length encoding manner -- similar, partly identical entries are merged together
     as much as possible.
 
