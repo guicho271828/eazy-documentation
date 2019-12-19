@@ -15,7 +15,11 @@
     ((list* file-or-system target rest)
      #+sbcl
      (proclaim '(sb-ext:muffle-conditions sb-ext:compiler-note style-warning))
-     (apply #'generate-html file-or-system target (mapcar #'read-from-string rest))
+     (apply #'generate-html file-or-system target
+            (mapcar (lambda (s) (handler-case (read-from-string s)
+                                  (error ()
+                                    s)))
+                    rest))
      (finish-output *error-output*)
      (finish-output *trace-output*)
      (finish-output *standard-output*)
