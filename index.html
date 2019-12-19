@@ -1,0 +1,204 @@
+<html><head><link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Comfortaa|Raleway|Ubuntu' /><link rel='stylesheet' type='text/css' href='default.css' /><script type='text/javascript' src='default.js'></script><title>eazy-documentation</title></head><body><div class="page-header"><div class="title"><h1>eazy-documentation</h1></div><div class="table-of-contents"><h1>Index</h1><ol><li><a href="#" data-node=""><span class="directory"></span></a><ol><li><a href="#README.md" data-node="README.md"><span class="file">README</span><span class="extension">md</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/readme.md">[source]</a></a></li><li><a href="#README.md~" data-node="README.md~"><span class="file">README</span><span class="extension">md~</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/readme.md~">[source]</a></a></li></ol></li><li><a href="#src" data-node="src"><span class="directory">src</span></a><ol><li><a href="#src/0package.lisp" data-node="src/0package.lisp"><span class="file">0package</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/0package.lisp">[source]</a></a></li><li><a href="#src/1definition.lisp" data-node="src/1definition.lisp"><span class="file">1definition</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/1definition.lisp">[source]</a></a></li><li><a href="#src/1raw-html.lisp" data-node="src/1raw-html.lisp"><span class="file">1raw-html</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/1raw-html.lisp">[source]</a></a></li><li><a href="#src/4user.lisp" data-node="src/4user.lisp"><span class="file">4user</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/4user.lisp">[source]</a></a></li><li><a href="#src/5template.lisp" data-node="src/5template.lisp"><span class="file">5template</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/5template.lisp">[source]</a></a></li><li><a href="#src/5template.lisp" data-node="src/5template.lisp"><span class="file">5template</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/5template.lisp">[source]</a></a></li></ol></li></ol></div></div><div class="main"><h1 id=""><span class="directory"></span></h1><h2 id="README.md"><span class="file">README</span><span class="extension">md</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/readme.md">[source]</a></h2><div class="doc-entry"><div class="entry"><div class="static-file"><div class="docstring"><h1 id="eazy-documentation-img">Eazy-Documentation <a href="https://travis-ci.org/numcl/numcl"><img src="https://travis-ci.org/eazy-documentation/eazy-documentation.svg" alt="img" /></a></h1>
+<ul>
+<li><strong>One-shot solution to the CL library documentation generator.</strong>
+<ul>
+<li>It <strong>does not require any custom macro/read-macro for annotating your API.</strong> Existing documentation generator supports only a limited number of macros (e.g. <code>defun</code>), or requires a user-defined extensions to the parser that extracts the documentation strings (e.g. see <a href="http://quickdocs.org/docparser/">docparser</a>). In contrast, this library runs based on the heuristic decision and ranking.</li>
+<li>It <strong>searches the repository for any potential documentation files and embed</strong> <strong>them in the output as html</strong>. Some library (especially the old ones like CFFI) contains a separate documentation / manual as texinfo documents, but they will be all embedded in the output.</li>
+<li>It supports any markup format supported by Pandoc and makeinfo.</li>
+</ul></li>
+<li><strong>Best documentation gives you the most with the least text.</strong>
+<ul>
+<li>Bloated, redundant entries are harmful. Eazy-Documentation therefore provides a compact documentation by compressing the documentation entries in a run-length encoding manner – similar, partly identical entries are merged together as much as possible.</li>
+</ul></li>
+<li><strong>Respect the code structure and ordering.</strong>
+<ul>
+<li>Well-written library has a nice, intuitive code structure. This must be exploited by the documentation generator – inspired by <a href="http://quickdocs.org/">Quickdocs</a>.</li>
+</ul></li>
+</ul>
+<p><a href="https://guicho271828.github.io/eazy-documentation/">Example page containing the documentation of eazy-documentation itself can be found here.</a></p>
+<p><a href="https://numcl.github.io/numcl/">Another example for NUMCL library</a>.</p>
+<pre><code>Usage: eazy-documentation file-or-system output [OPTIONS]
+
+
+ The output is a single file when the output has a html extension;
+ otherwise it will be considered as a directory name.
+
+ Options are specified as follows:
+Options:
+
+  keyword               description
+  -------------------   ------------------------------------------------------
+  :title                Documentation title
+  :header               The header inserted after the title
+  :footer               The footer inserted at the bottom
+  :markup               Markup langage used in the docstring, should be supported by pandoc.
+  -------------------   ---------------------------------------------------------
+  :whitelist            Whitelist of the package designators for the symbols being documented
+  :blacklist            Blacklist of the package designators for the symbols being documented
+  :external-only        Generate entries for external symbols only
+  -------------------   ---------------------------------------------------------
+  :toc                  Generate a table of contents (toc)
+  :max-depth            The maximum depth of a toc
+  -------------------   ---------------------------------------------------------
+  :template-class       COMMON-HTML template class, no need to be chanded.
+  :css-list             List of CSS scripts to be added to the template.
+  :js-list              List of Javascripts to be added to the template.
+  :font-list            List of Google fonts to be added to the template.
+  :clean                Overwrite CSS/JS in the target directory
+  -------------------   ---------------------------------------------------------
+  :remote-root          Used to generate a weblink. Example: https://github.com/&lt;name&gt;/&lt;proj&gt;
+  :local-root           Used to generate a weblink. Example: /home/&lt;user&gt;/lisp/&lt;proj&gt;
+  :relative             When non-nil, the output is relative to the value of local-root.
+  :static-files         List of static README files etc.
+  -------------------   ---------------------------------------------------------</code></pre>
+<h2 id="requirements">Requirements</h2>
+<p><code>texinfo</code> and up-to-date <code>pandoc</code> (note: some package managers, e.g., Ubuntu’s APT, provides a severely outdated version and results in a terrible output. Install the latest version from https://pandoc.org/installing.html )</p>
+<h2 id="author-license-copyright">Author, License, Copyright</h2>
+<p>Masataro Asai (guicho2.71828@gmail.com)</p>
+<p>Licensed under LGPL v3.</p>
+<p>Copyright (c) 2019 IBM Corporation</p>
+</div></div></div></div><h2 id="README.md~"><span class="file">README</span><span class="extension">md~</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/readme.md~">[source]</a></h2><div class="doc-entry"><div class="entry"><div class="static-file"><div class="docstring"><h1 id="eazy-documentation-img">Eazy-Documentation <a href="https://travis-ci.org/numcl/numcl"><img src="https://travis-ci.org/eazy-documentation/eazy-documentation.svg" alt="img" /></a></h1>
+<ul>
+<li><strong>One-shot solution to the CL library documentation generator.</strong>
+<ul>
+<li>It <strong>does not require any custom macro/read-macro for annotating your API.</strong> Existing documentation generator supports only a limited number of macros (e.g. <code>defun</code>), or requires a user-defined extensions to the parser that extracts the documentation strings (e.g. see <a href="http://quickdocs.org/docparser/">docparser</a>). In contrast, this library runs based on the heuristic decision and ranking.</li>
+<li>It <strong>searches the repository for any potential documentation files and embed</strong> <strong>them in the output as html</strong>. Some library (especially the old ones like CFFI) contains a separate documentation / manual as texinfo documents, but they will be all embedded in the output.</li>
+<li>It supports any markup format supported by Pandoc and makeinfo.</li>
+</ul></li>
+<li><strong>Best documentation gives you the most with the least text.</strong>
+<ul>
+<li>Bloated, redundant entries are harmful. Eazy-Documentation therefore provides a compact documentation by compressing the documentation entries in a run-length encoding manner – similar, partly identical entries are merged together as much as possible.</li>
+</ul></li>
+<li><strong>Respect the code structure and ordering.</strong>
+<ul>
+<li>Well-written library has a nice, intuitive code structure. This must be exploited by the documentation generator – inspired by <a href="http://quickdocs.org/">Quickdocs</a>.</li>
+</ul></li>
+</ul>
+<p><a href="https://guicho271828.github.io/eazy-documentation/">Example page containing the documentation of eazy-documentation itself can be found here.</a></p>
+<p><a href="https://numcl.github.io/numcl/">Another example for NUMCL library</a>.</p>
+<h2 id="author-license-copyright">Author, License, Copyright</h2>
+<p>Masataro Asai (guicho2.71828@gmail.com)</p>
+<p>Licensed under LGPL v3.</p>
+<p>Copyright (c) 2019 IBM Corporation</p>
+</div></div></div></div><h1 id="src"><span class="directory">src</span></h1><h2 id="src/0package.lisp"><span class="file">0package</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/0package.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="defpackage-eazy-documentation"><div class="pkg-KEYWORD EXTERNAL"><div class="span"><span class="doctype">defpackage</span></div><div class="span"><span class="name" id="KEYWORD:EAZY-DOCUMENTATION">eazy-documentation</span></div></div></h3><div class="docstring"><p>This package provides an easy way to extract documentations from a lisp source code.</p>
+<p>Advantages over the existing libraries:</p>
+<ul>
+<li><p>EAZY-DOCUMENTATION can generate documents from a single file or an ASDF system. Run <code>(eazy-documentation:generate-html &lt;file-or-system&gt; "index.html")</code> No additional quirks are necessary.</p></li>
+<li><p>Extraction is heuristic and robust. It is easily automated and can handle unknown user-defined macro whose name begins with DEF.</p></li>
+<li><p>As per Quickdocs, it respects the file and directory structure. Well-written, maintainable libraries have a great readability in the source code. This should be respected and the documentation generator should respect this structure.</p></li>
+<li><p>It minimizes the clutter in the auto-generateded output by detecting and grouping the similar documentation entries. For example, these entries are grouped together:</p>
+<ul>
+<li>Functions with the same lambda-list and docstrings.</li>
+<li>Variables with the same docstrings.</li>
+<li>Any DEF-something macro entries with the same name and missing documentations.</li>
+</ul></li>
+<li><p>Typesetting and syntax highlighting of docstring is done by <a href="https://pandoc.org/">Pandoc</a> which supports a wide range of language and format support.</p>
+<p>Run <code>curl -sSL https://get.haskellstack.org/ | sh &amp;&amp; stack install pandoc</code> to install the latest Pandoc.</p></li>
+<li><p>The output is a common-doc object, thus easily pluggable to the existing emitter for them.</p></li>
+</ul>
+</div></div></div><h2 id="src/1definition.lisp"><span class="file">1definition</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/1definition.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="defmethod-print-object-(def-def)-s"><div class="pkg-COMMON-LISP EXTERNAL"><div class="span"><span class="doctype">defmethod</span></div><div class="span"><span class="name" id="COMMON-LISP:PRINT-OBJECT">print-object</span></div><span class="args lisp">(def def) s</span></div></h3><div class="docstring missing">(documentation missing)</div></div></div><h2 id="src/1raw-html.lisp"><span class="file">1raw-html</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/1raw-html.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="define-node-defclass-raw-text-node-common-html.emitter"><div class="pkg-COMMON-HTML.EMITTER EXTERNAL"><div class="span"><span class="doctype">define-node</span><span class="doctype">defclass</span></div><div class="span"><span class="name" id="COMMON-HTML.EMITTER:RAW-TEXT-NODE">raw-text-node</span></div><span class="package">common-html.emitter</span></div></h3></div><div class="entry"><h3 id="defun-convert-file-to-html-string-pin"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:CONVERT-FILE-TO-HTML-STRING">convert-file-to-html-string</span></div><span class="args lisp">pin</span></div></h3></div><div class="entry"><h3 id="defun-convert-string-to-html-string-string-markup"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:CONVERT-STRING-TO-HTML-STRING">convert-string-to-html-string</span></div><span class="args lisp">string markup</span></div></h3></div><div class="entry"><h3 id="defun-convert-file-to-ascii-string-pin"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:CONVERT-FILE-TO-ASCII-STRING">convert-file-to-ascii-string</span></div><span class="args lisp">pin</span></div></h3></div><div class="entry"><h3 id="defun-convert-string-to-ascii-string-string-markup"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:CONVERT-STRING-TO-ASCII-STRING">convert-string-to-ascii-string</span></div><span class="args lisp">string markup</span></div></h3><div class="docstring missing">(all documentation missing)</div></div></div><h2 id="src/4user.lisp"><span class="file">4user</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/4user.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="defun-extract-definitions-from-file-file-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:EXTRACT-DEFINITIONS-FROM-FILE">extract-definitions-from-file</span></div><span class="args lisp">file &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-extract-definitions-from-system-system-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:EXTRACT-DEFINITIONS-FROM-SYSTEM">extract-definitions-from-system</span></div><span class="args lisp">system &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-generate-commondoc-from-file-file-&rest-args-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:GENERATE-COMMONDOC-FROM-FILE">generate-commondoc-from-file</span></div><span class="args lisp">file &amp;rest args &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-generate-commondoc-from-system-system-&rest-args-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:GENERATE-COMMONDOC-FROM-SYSTEM">generate-commondoc-from-system</span></div><span class="args lisp">system &amp;rest args &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-generate-html-from-file-file-*target-pathname*-&rest-args-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:GENERATE-HTML-FROM-FILE">generate-html-from-file</span></div><span class="args lisp">file *target-pathname* &amp;rest args &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-generate-html-from-system-system-*target-pathname*-&rest-args-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:GENERATE-HTML-FROM-SYSTEM">generate-html-from-system</span></div><span class="args lisp">system *target-pathname* &amp;rest args &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3></div><div class="entry"><h3 id="defun-generate-html-file-or-system-*target-pathname*-&rest-args-&key-(title-(no-title)-title-supplied-p)-(header-)-(footer-)-(whitelist-nil)-(blacklist-'nil)-(external-only-t)-(toc-t)-(max-depth-2)-(template-class-'eazy-template)-(css-list-*default-css*)-(js-list-*default-js*)-(font-list-*default-fonts*)-(clean-nil)-((remote-root-*remote-root*)-nil)-((local-root-*local-root*)-nil)-(relative-nil)-(static-files-nil)-(markup-gfm)-&allow-other-keys"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:GENERATE-HTML">generate-html</span></div><span class="args lisp">file-or-system *target-pathname* &amp;rest args &amp;key (title (no title) title-supplied-p) (header ) (footer ) (whitelist nil) (blacklist 'nil) (external-only t) (toc t) (max-depth 2) (template-class 'eazy-template) (css-list *default-css*) (js-list *default-js*) (font-list *default-fonts*) (clean nil) ((remote-root *remote-root*) nil) ((local-root *local-root*) nil) (relative nil) (static-files nil) (markup gfm) &amp;allow-other-keys</span></div></h3><div class="docstring"><p>Options:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">keyword</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>:title</code></td>
+<td style="text-align: left;">Documentation title</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:header</code></td>
+<td style="text-align: left;">The header inserted after the title</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:footer</code></td>
+<td style="text-align: left;">The footer inserted at the bottom</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:markup</code></td>
+<td style="text-align: left;">Markup langage used in the docstring, should be supported by pandoc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">-------------------</td>
+<td style="text-align: left;">-------------------------------------------------------------------------</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:whitelist</code></td>
+<td style="text-align: left;">Whitelist of the package designators for the symbols being documented</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:blacklist</code></td>
+<td style="text-align: left;">Blacklist of the package designators for the symbols being documented</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:external-only</code></td>
+<td style="text-align: left;">Generate entries for external symbols only</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">-------------------</td>
+<td style="text-align: left;">-------------------------------------------------------------------------</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:toc</code></td>
+<td style="text-align: left;">Generate a table of contents (toc)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:max-depth</code></td>
+<td style="text-align: left;">The maximum depth of a toc</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">-------------------</td>
+<td style="text-align: left;">-------------------------------------------------------------------------</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:template-class</code></td>
+<td style="text-align: left;">COMMON-HTML template class, no need to be chanded.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:css-list</code></td>
+<td style="text-align: left;">List of CSS scripts to be added to the template.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:js-list</code></td>
+<td style="text-align: left;">List of Javascripts to be added to the template.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:font-list</code></td>
+<td style="text-align: left;">List of Google fonts to be added to the template.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:clean</code></td>
+<td style="text-align: left;">Overwrite CSS/JS in the target directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">-------------------</td>
+<td style="text-align: left;">-------------------------------------------------------------------------</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:remote-root</code></td>
+<td style="text-align: left;">Used to generate a weblink. Example: <code>https://github.com/&lt;name&gt;/&lt;proj&gt;</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:local-root</code></td>
+<td style="text-align: left;">Used to generate a weblink. Example: <code>/home/&lt;user&gt;/lisp/&lt;proj&gt;</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>:relative</code></td>
+<td style="text-align: left;">When non-nil, the output is relative to the value of local-root.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>:static-files</code></td>
+<td style="text-align: left;">List of static README files etc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">-------------------</td>
+<td style="text-align: left;">-------------------------------------------------------------------------</td>
+</tr>
+</tbody>
+</table>
+</div></div></div><h2 id="src/5template.lisp"><span class="file">5template</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/5template.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="defmethod-render-(template-eazy-template)-(document-document)-content-string"><div class="pkg-COMMON-HTML.TEMPLATE EXTERNAL"><div class="span"><span class="doctype">defmethod</span></div><div class="span"><span class="name" id="COMMON-HTML.TEMPLATE:RENDER">render</span></div><span class="args lisp">(template eazy-template) (document document) content-string</span></div></h3><div class="docstring"><p>The simplest template.</p>
+</div></div></div><div class="doc-entry"><div class="entry"><h3 id="defmethod-render-section-(template-eazy-template)-(document-document)-(section-section)-content-string"><div class="pkg-COMMON-HTML.TEMPLATE EXTERNAL"><div class="span"><span class="doctype">defmethod</span></div><div class="span"><span class="name" id="COMMON-HTML.TEMPLATE:RENDER-SECTION">render-section</span></div><span class="args lisp">(template eazy-template) (document document) (section section) content-string</span></div></h3><div class="docstring"><p>The simplest section template.</p>
+</div></div></div><h2 id="src/5template.lisp"><span class="file">5template</span><span class="extension">lisp</span><a class="source-link" href="file:///home/guicho/repos/lisp/eazy-documentation/src/5template.lisp">[source]</a></h2><div class="doc-entry"><div class="entry"><h3 id="defun-main-&rest-argv"><div class="pkg-EAZY-DOCUMENTATION EXTERNAL"><div class="span"><span class="doctype">defun</span></div><div class="span"><span class="name" id="EAZY-DOCUMENTATION:MAIN">main</span></div><span class="args lisp">&amp;rest argv</span></div></h3><div class="docstring missing">(documentation missing)</div></div></div></div><div class="footer"></div></body></html>
