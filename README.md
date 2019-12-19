@@ -27,6 +27,8 @@
 
 [Another example for NUMCL library](https://numcl.github.io/numcl/).
 
+Command line interface can be installed via Roswell: `ros install guicho271828/eazy-documentation`
+
 
 ```
 Usage: eazy-documentation file-or-system output [OPTIONS]
