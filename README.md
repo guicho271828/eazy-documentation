@@ -60,7 +60,7 @@ Options:
   :font-list            List of Google fonts to be added to the template.
   :clean                Overwrite CSS/JS in the target directory
   -------------------   ---------------------------------------------------------
-  :remote-root          Used to generate a weblink. Example: https://github.com/<name>/<proj>
+  :remote-root          Used to generate a weblink. Example: https://github.com/<name>/<proj>/blob/master
   :local-root           Used to generate a weblink. Example: /home/<user>/lisp/<proj>
   :relative             When non-nil, the output is relative to the value of local-root.
   :static-files         List of static README files etc.

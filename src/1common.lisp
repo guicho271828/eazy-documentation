@@ -48,7 +48,7 @@ Options:
 | `:clean`          | Overwrite CSS/JS in the target directory                                |
 |-------------------|-------------------------------------------------------------------------|
 | `:remote-root`    | Used to generate a weblink. Example: `https://github.com/<name>/<proj>` |
-| `:local-root`     | Used to generate a weblink. Example: `/home/<user>/lisp/<proj>`         |
+| `:local-root`     | Used to generate a weblink. Example: `/home/<user>/lisp/<proj>/blob/master` |
 | `:relative`       | When non-nil, the output is relative to the value of local-root.        |
 | `:static-files`   | List of static README files etc.                                        |
 |-------------------|-------------------------------------------------------------------------|
