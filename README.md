@@ -40,31 +40,30 @@ Options are specified as follows:
 
 Options:
 
-  keyword           description
-  ----------------- ----------------------------------------------------------------------------------------------
-  :title            Documentation title
-  :header           The header inserted after the title
-  :footer           The footer inserted at the bottom
-  :markup           Markup langage used in the docstring, should be supported by pandoc.
-                    
-  :whitelist        Whitelist of the package designators for the symbols being documented
-  :blacklist        Blacklist of the package designators for the symbols being documented
-  :external-only    Generate entries for external symbols only
-                    
-  :toc              Generate a table of contents (toc)
-  :max-depth        The maximum depth of a toc
-                    
-  :template-class   COMMON-HTML template class, no need to be chanded.
-  :css-list         List of CSS scripts to be added to the template.
-  :js-list          List of Javascripts to be added to the template.
-  :font-list        List of Google fonts to be added to the template.
-  :clean            Overwrite CSS/JS in the target directory
-                    
-  :remote-root      Used to generate a weblink. Example: [https://github.com/](https://github.com/)<name>/<proj>
-  :local-root       Used to generate a weblink. Example: /home/<user>/lisp/<proj>/blob/master
-  :relative         When non-nil, the output is relative to the value of local-root.
-  :static-files     List of static README files etc.
-```
+| keyword         | description                                                               |
+|:----------------|:--------------------------------------------------------------------------|
+| :title          | Documentation title                                                       |
+| :header         | The header inserted after the title                                       |
+| :footer         | The footer inserted at the bottom                                         |
+| :markup         | Markup langage used in the docstring, should be supported by pandoc.      |
+|                 |                                                                           |
+| :whitelist      | Whitelist of the package designators for the symbols being documented     |
+| :blacklist      | Blacklist of the package designators for the symbols being documented     |
+| :external-only  | Generate entries for external symbols only                                |
+|                 |                                                                           |
+| :toc            | Generate a table of contents (toc)                                        |
+| :max-depth      | The maximum depth of a toc                                                |
+|                 |                                                                           |
+| :template-class | COMMON-HTML template class, no need to be chanded.                        |
+| :css-list       | List of CSS scripts to be added to the template.                          |
+| :js-list        | List of Javascripts to be added to the template.                          |
+| :font-list      | List of Google fonts to be added to the template.                         |
+| :clean          | Overwrite CSS/JS in the target directory                                  |
+|                 |                                                                           |
+| :remote-root    | Used to generate a weblink. Example: https://github.com/<name>/<proj>     |
+| :local-root     | Used to generate a weblink. Example: /home/<user>/lisp/<proj>/blob/master |
+| :relative       | When non-nil, the output is relative to the value of local-root.          |
+| :static-files   | List of static README files etc.                                          |
 
 ## Requirements
 
