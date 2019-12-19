@@ -30,6 +30,7 @@
              ~%~
              ~% The output is a single file when the output has a html extension;~
              ~% otherwise it will be considered as a directory name.~
+             ~% It comes with a CSS and an empty javascript file.~
              ~%~
              ~% Options are specified as follows:~
              ~%~
