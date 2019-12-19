@@ -65,6 +65,11 @@ Options:
   -------------------   ---------------------------------------------------------
 ```
 
+## Requirements
+
+`texinfo` and up-to-date `pandoc` (note: some package
+managers, e.g., Ubuntu's APT, provides a severely outdated version and results in a terrible output.
+Install the latest version from https://pandoc.org/installing.html )
 
 ## Author, License, Copyright
 
