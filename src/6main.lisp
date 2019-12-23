@@ -10,7 +10,7 @@
                         :output t
                         :error-output t)
     (error ()
-      (roswell:quit 1)))
+      (uiop:symbol-call "ROSWELL" "QUIT" 1)))
   (match argv
     ((list* file-or-system target rest)
      #+sbcl
