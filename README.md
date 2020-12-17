@@ -54,7 +54,7 @@ Options:
 | :toc            | Generate a table of contents (toc)                                        |
 | :max-depth      | The maximum depth of a toc                                                |
 |                 |                                                                           |
-| :template-class | COMMON-HTML template class, no need to be chanded.                        |
+| :template-class | COMMON-HTML template class, no need to be changed.                        |
 | :css-list       | List of CSS scripts to be added to the template.                          |
 | :js-list        | List of Javascripts to be added to the template.                          |
 | :font-list      | List of Google fonts to be added to the template.                         |
