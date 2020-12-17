@@ -3,9 +3,9 @@
 
 -   **One-shot solution to the CL library documentation generator.**
     -   It **does not require any custom macro/read-macro for annotating your API.**
-        Existing documentation generator supports only a limited number of macros (e.g. `defun`),
+        Existing documentation generators supports only a limited number of macros (e.g. `defun`),
         or requires a user-defined extensions to the parser that extracts the
-        documentation strings (e.g. see [docparser](http://quickdocs.org/docparser/)).  In contrast, this library runs based on the heuristic
+        documentation strings (e.g. see [docparser](https://github.com/eudoxia0/docparser)).  In contrast, this library runs based on the heuristic
         decision and ranking.
     -   It **searches the repository for any potential documentation files and embed**
         **them in the output as html**. Some library (especially the old ones like CFFI)
