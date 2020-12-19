@@ -222,7 +222,13 @@
   #.+doc+
   #.+ignore+
   (if (and (typep file-or-system '(or string pathname))
-           (probe-file file-or-system)
-           (string-equal "lisp" (pathname-type file-or-system)))
-      (apply #'generate-html-from-file   file-or-system *target-pathname* args)
+           (probe-file file-or-system))
+      (cond
+        ((string-equal "lisp" (pathname-type file-or-system))
+         (apply #'generate-html-from-file   file-or-system *target-pathname* args))
+        ((uiop:directory-exists-p file-or-system)
+         (apply #'generate-html-from-dir   file-or-system *target-pathname* args))
+        (t (format t "~A is not a lisp file or a directory"
+                   file-or-system)
+           (uiop:quit 1)))
       (apply #'generate-html-from-system file-or-system *target-pathname* args)))
