@@ -18,18 +18,18 @@
 
 (defun convert-file-to-html-string (pin)
   (if (string-equal "texinfo" (pathname-type pin))
-      (let* ((files (uiop:run-program (format nil "grep @setfilename ~a" pin)
+      (let* ((files (uiop:run-program (format nil "grep @setfilename \"~a\"" pin)
                                       :ignore-error-status t
                                       :output :lines))
              (output1 (second (ppcre:split " +" (first files))))
              (output2
-              (make-pathname
-               :type "xml"
-               :name (pathname-name output1)
-               :defaults (uiop:pathname-directory-pathname *target-pathname*))))
+               (make-pathname
+                :type "xml"
+                :name (pathname-name output1)
+                :defaults (uiop:pathname-directory-pathname *target-pathname*))))
         ;; (assert (= 1 (length files)))
         (ensure-directories-exist output2)
-        (uiop:run-program (format nil "cd ~a; texi2any --docbook ~a"
+        (uiop:run-program (format nil "cd \"~a\"; texi2any --docbook \"~a\""
                                   (dirname *target-pathname*)
                                   pin)
                           :output t
@@ -42,7 +42,7 @@
         (handler-case
             (progn
               (uiop:run-program
-               (format nil "pandoc -o ~a ~a" pout pin)
+               (format nil "pandoc -o \"~a\" \"~a\"" pout pin)
                :output t
                :error-output t)
               (read-file-into-string pout))
