@@ -19,6 +19,10 @@
           (format nil "file://~a" (getf args :local-root))))
   args)
 
+(defun strip/ (filename)
+  (check-type filename string)
+  (ppcre:regex-replace "/$" filename ""))
+
 (defun augment-args-from-system (system &rest args &key . #.+keywords+)
   #.+doc+
   #.+ignore+
@@ -35,19 +39,43 @@
                 hp)
             (format nil "file://~a" (getf args :local-root)))))
   (when (not static-files)
-    (let ((dir (asdf:system-source-directory (asdf:find-system system))))
-      (when-let ((lines (append
-                         (ignore-errors
-                           (uiop:run-program
-                            (format nil "find ~a -name \"README*\" -type f" dir)
-                            :output :lines))
-                         (ignore-errors
-                           (uiop:run-program
-                            (format nil "find ~adoc/ ~{-name \"*.~a\"~^ -or ~}"
-                                    dir
-                                    *supported-extensions*)
-                            :output :lines)))))
-        (setf (getf args :static-files) (sort lines #'string<)))))
+    (let* ((dir (asdf:system-source-directory (asdf:find-system system)))
+           (dir-as-string (uiop:unix-namestring dir)))
+      (labels ((make-relative (filename)
+                 (subseq (uiop:unix-namestring filename)
+                         (length dir-as-string)))
+               (ignore-p (filename)
+                 ;; It would be nice to support .gitignore
+                 ;; or other types of .*ignore files,
+                 ;; and allow to pass additional ignore rules
+                 ;; as argument.
+                 ;; This way user will be able to exclude
+                 ;; some files from the docs.
+                 ;; 
+                 ;; But right now as a hack we'll ignore just
+                 ;; .qlot/ directory:
+                 (match (make-relative filename)
+                   ((trivia.ppcre:ppcre "^.qlot/.*")
+                    t))))
+        (when-let ((lines (append
+                           (ignore-errors
+                            (uiop:run-program
+                             (format nil "find ~a -name \"README*\" -type f"
+                                     ;; Without stripping last / resulting
+                                     ;; pathnames will be like /Users/bob/project//other/README.md
+                                     ;; and it will be harder to ignore them
+                                     (strip/ dir-as-string))
+                             :output :lines))
+                           (ignore-errors
+                            (uiop:run-program
+                             (format nil "find ~adoc/ ~{-name \"*.~a\"~^ -or ~}"
+                                     dir
+                                     *supported-extensions*)
+                             :output :lines)))))
+          (setf (getf args :static-files)
+                (sort (remove-if #'ignore-p
+                                 lines)
+                      #'string<))))))
   args)
 
 (defun extract-definitions-from-file (file &key . #.+keywords+)
