@@ -51,18 +51,24 @@
 (defun process-black-white-list (defs blacklist whitelist external-only)
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
-  (delete-if
+  (remove-if
    (lambda (def)
      (let ((name (safe-name def)))
-       (or (some (curry #'find-symbol (symbol-name name)) blacklist)
-           (and whitelist
-                ;; skip if the name is not in the whitelist, if provided
-                (notany (curry #'find-symbol (symbol-name name)) whitelist))
-           (when external-only
-             (or (null (symbol-package name)) ; for gensyms
-                 (not (eq :external
-                          (nth-value 1 (find-symbol (symbol-name name)
-                                                    (symbol-package name))))))))))
+       (or (when (some (curry #'find-symbol (symbol-name name)) blacklist)
+             (note "removed by blacklist: ~_~a" def)
+             t)
+           (when (and whitelist
+                      ;; skip if the name is not in the whitelist, if provided
+                      (notany (curry #'find-symbol (symbol-name name)) whitelist))
+             (note "removed because not in whitelist: ~_~a" def)
+             t)
+           (when (when external-only
+                   (or (null (symbol-package name)) ; for gensyms
+                       (not (eq :external
+                                (nth-value 1 (find-symbol (symbol-name name)
+                                                          (symbol-package name)))))))
+             (note "removed because it is not external in its own package ~a: ~_~a" (symbol-package name) def)
+             t))))
    defs))
 
 (defun generate-commondoc (defs &rest args &key . #.+keywords+)

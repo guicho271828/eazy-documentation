@@ -13,6 +13,7 @@ because the docstring may not be available in the macro expansion time unlike ma
   (let ((obj (apply #'make-instance 'def initargs)))
     (if-let ((it (find obj *defs* :test #'def=)))
       (progn
+        (note "same def found, merging: ~_~a, ~_~a" it obj)
         (merge-slot obj it 'args)
         (merge-slot obj it 'docstring))
       (vector-push-extend obj *defs* (max 1 (length *defs*))))))
@@ -31,6 +32,7 @@ because the docstring may not be available in the macro expansion time unlike ma
   (funcall *old-macroexpand-hook* expander form env))
 
 (defun extract-definitions (form)
+  (note "parsing ~a..." (first form))
   (match form
     #+(or)
     ((list* 'setf args)
@@ -38,6 +40,7 @@ because the docstring may not be available in the macro expansion time unlike ma
     ((list* macro _)
      (when (macro-function macro)
        (when (eql 0 (search "DEF" (symbol-name macro)))
+         (note "This looks like a define macro")
          (parse-def form))))))
 
 (defun natural-language-string-p (string)

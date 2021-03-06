@@ -64,13 +64,15 @@
 
 (defun extract-definitions-from-system (system &key . #.+keywords+)
   #.+doc+
-  #.+ignore+  
-  (let ((*compile-print* nil)
-        (*compile-verbose* nil))
+  #.+ignore+
+  (note ";;;;; Step 1: load the system")
+  (let ((*compile-print* t)
+        (*compile-verbose* t))
     (asdf:load-system system))
   (uiop:with-temporary-file (:pathname p)
     (call-with-extracting-definitions
      (lambda ()
+       (note ";;;;; Step 2: Import static files")
        (dolist (file static-files)
          (ignore-errors
            (add-def :name (make-keyword (local-enough-namestring file))
@@ -78,13 +80,17 @@
                     :file file
                     :docstring (read-file-into-string file))))
        (with-compilation-unit ()
-         (let ((*compile-print* nil)
-               (*compile-verbose* nil))
+         (let ((*compile-print* t)
+               (*compile-verbose* t)
+               (*trace-output* (make-synonym-stream '*error-output*)))
+           (note ";;;;; Step 3: Parse ASDF file")
            (let ((*package* (find-package :asdf)))
              (compile-file (asdf:system-source-file system) :output-file p))
            (asdf:clear-system system)
-           (asdf:compile-system system :verbose nil :force t)))
+           (note ";;;;; Step 4: Recompile the system")
+           (asdf:compile-system system :force t)))
        (when *deferred-tasks*
+         (note ";;;;; Step 5: Process deferred tasks")
          (asdf:load-system system)
          (mapc #'funcall *deferred-tasks*))
        *defs*))))
