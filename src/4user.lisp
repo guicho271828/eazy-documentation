@@ -7,7 +7,7 @@
   "the list of supported extensions scraped by eazy-documentation")
 
 (defun augment-args-from-file (file &rest args &key . #.+keywords+)
-  #.+doc+
+  "Supply missing command-line arguments using file information"
   #.+ignore+
   (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~@(~a~) documentation" file)))
@@ -20,7 +20,7 @@
   args)
 
 (defun augment-args-from-system (system &rest args &key . #.+keywords+)
-  #.+doc+
+  "Supply missing command-line arguments using system information"
   #.+ignore+
   (when (not title-supplied-p)
     (setf (getf args :title) (format nil "~a" system)))

@@ -74,6 +74,7 @@ Advantages over the existing libraries:
 (in-package :eazy-documentation)
 
 (defun list-all-define-macros (&aux acc)
+  "Print a list of all macros in the current lisp image whose name starts with DEF."
   (do-all-symbols (s)
     (when (and (fboundp s)
                (macro-function s)
@@ -84,6 +85,7 @@ Advantages over the existing libraries:
       (format t "~%~(~v@a : ~a~)" len s (princ-to-string (sb-kernel:%fun-lambda-list (macro-function s)))))))
 
 (defun note (format-string &rest args)
+  "A custom format variant for printing a note while eazy-documentation is processing a file."
   (fresh-line *error-output*)
   (let ((*print-right-margin* 100)
         (*print-pretty* t)

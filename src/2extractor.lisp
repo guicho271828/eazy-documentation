@@ -3,6 +3,10 @@
 (defvar *defs*)
 (defvar *old-macroexpand-hook*)
 (defvar *deferred-tasks*)
+(setf (documentation '*deferred-tasks* 'variable)
+      "A list of thunks. Each thunk contains code to extract the docstring after loading the system.
+This variable is mainly used for parsing (setf (documentation ...)) forms
+because the docstring may not be available in the macro expansion time unlike macros such as DEFUN.")
 
 (defun add-def (&rest initargs &key doctype name args docstring file)
   (declare (ignore doctype name args docstring file))
