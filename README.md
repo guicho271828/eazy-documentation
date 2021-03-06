@@ -1,5 +1,5 @@
 
-# Eazy-Documentation [![img](https://travis-ci.org/eazy-documentation/eazy-documentation.svg)](https://travis-ci.org/numcl/numcl)
+# Eazy-Documentation [![img](https://travis-ci.org/guicho271828/eazy-documentation.svg)](https://travis-ci.org/guicho271828/eazy-documentation)
 
 -   **One-shot solution to the CL library documentation generator.**
     -   It **does not require any custom macro/read-macro for annotating your API.**
