@@ -64,10 +64,14 @@
              t)
            (when (when external-only
                    (or (null (symbol-package name)) ; for gensyms
-                       (not (eq :external
-                                (nth-value 1 (find-symbol (symbol-name name)
-                                                          (symbol-package name)))))))
-             (note "removed because it is not external in its own package ~a: ~_~a" (symbol-package name) def)
+                       (not (eq :external (symbol-status name)))))
+             (note "removed because ~a is not external in its own package ~a: ~_~a" name (symbol-package name) def)
+             t)
+           (when (when external-only
+                   (when (not (keywordp (doctype def)))
+                     (not (eq :external (symbol-status (doctype def))))))
+             (note "removed because ~a definer/doctype is not external (i.e., an unexported macro) in its own package ~a: ~_~a"
+                   (doctype def) (symbol-package (doctype def)) def)
              t))))
    defs))
 

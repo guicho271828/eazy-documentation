@@ -69,7 +69,9 @@ Advantages over the existing libraries:
    #:convert-file-to-ascii-string
    #:convert-string-to-ascii-string
    #:generate-html
-   #:main))
+   #:main
+   ;; exported because otherwise EXTERNAL-ONLY pruning rule will accidentally remove static files.
+   #:static-file))
 
 (in-package :eazy-documentation)
 
