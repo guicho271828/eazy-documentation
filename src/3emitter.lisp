@@ -239,16 +239,26 @@
   (make-text (string string)
              :metadata (when classes (apply #'classes classes))))
 
-(defun span-id (sym &rest classes)
+(defun span-id (name &rest classes)
   "Create a span element with an id based on SYM."
-  (declare (symbol sym))
-  (let ((id (format nil "~a:~a"
-                    (package-name (symbol-package sym))
-                    (symbol-name sym))))
-    (setf (gethash sym *ids*) id)
-    (make-text (string-downcase sym)
-               :metadata (when classes (apply #'classes classes))
-               :reference id)))
+  (declare (name name))
+  (ematch name
+    ((list 'setf sym)
+     (let ((id (format nil "(setf ~a:~a)"
+                       (package-name (symbol-package sym))
+                       (symbol-name sym))))
+       (setf (gethash sym *ids*) id)
+       (make-text (format nil "(setf ~(~a~))" (symbol-name sym))
+                  :metadata (when classes (apply #'classes classes))
+                  :reference id)))
+    ((and (symbol) sym)
+     (let ((id (format nil "~a:~a"
+                       (package-name (symbol-package sym))
+                       (symbol-name sym))))
+       (setf (gethash sym *ids*) id)
+       (make-text (string-downcase sym)
+                  :metadata (when classes (apply #'classes classes))
+                  :reference id)))))
 
 (defun par (string &rest classes)
   (make-content
@@ -314,7 +324,7 @@
                  (fdiv
                   (iter (for def in defs)
                         (collecting
-                          (span-id (safe-name def) "name" (symbol-status (safe-name def))))))
+                          (span-id (name def) "name" (symbol-status (safe-name def))))))
                  (print-package def) 
                  (print-args def))
           ;; the entire entry is hidden based on the package and
@@ -328,7 +338,7 @@
                   (iter (for def in defs)
                         (collecting (span (down (doctype def)) "doctype"))))
                  (fdiv
-                  (span-id (safe-name def) "name"))
+                  (span-id (name def) "name"))
                  (print-package def)
                  (print-args def))
           ;; the entire entry is hidden based on the package and
@@ -344,7 +354,7 @@
                (fdiv
                 (span (down (doctype def)) "doctype"))
                (fdiv
-                (span-id (safe-name def) "name"))
+                (span-id (name def) "name"))
                (print-args def))
               ;; the entire entry is hidden based on the package and
               ;; external/internal status
