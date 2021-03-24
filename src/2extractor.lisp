@@ -144,6 +144,7 @@ because the docstring may not be available in the macro expansion time unlike ma
      
      (apply #'add-def acc))))
 
+;; still unused
 (defun parse-setf (args)
   (match args
     (nil
@@ -157,14 +158,15 @@ because the docstring may not be available in the macro expansion time unlike ma
                           :doctype (case type
                                      (function 'defun)
                                      (variable
-                                      (if (constantp name)
+                                      (if (char= #\+ (aref (symbol-name name) 0))
                                           'defconstant
                                           'defvar))
                                      (structure 'defstruct)
                                      (type 'deftype)
                                      (method-combination 'define-method-combination)
                                      (setf 'defsetf)
-                                     (compiler-macro 'define-compiler-macro))
+                                     (compiler-macro 'define-compiler-macro)
+                                     (t type))
                           :docstring (documentation name type)))
                *deferred-tasks*)))
      (parse-setf rest))))
