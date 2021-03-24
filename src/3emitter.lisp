@@ -280,10 +280,11 @@
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
-(defun symbol-package-name-class (name)
+(defun symbol-package-name-class (sym)
+  (declare (symbol sym))
   (format nil "pkg-~a"
           (package-name
-           (symbol-package name))))
+           (symbol-package sym))))
 
 (defun symbol-status (sym)
   (declare (symbol sym))
@@ -295,7 +296,7 @@
 
 (defun entry-status (defs)
   (if (find :external defs
-            :key (lambda (def) (symbol-status (name def))))
+            :key (lambda (def) (symbol-status (safe-name def))))
       ;; if no :external is found, then
       ;; the whole entry is also marked internal
       :external
@@ -313,12 +314,12 @@
                  (fdiv
                   (iter (for def in defs)
                         (collecting
-                          (span-id (name def) "name" (symbol-status (name def))))))
+                          (span-id (safe-name def) "name" (symbol-status (safe-name def))))))
                  (print-package def) 
                  (print-args def))
           ;; the entire entry is hidden based on the package and
           ;; external/internal status
-          :metadata (classes (symbol-package-name-class (name def))
+          :metadata (classes (symbol-package-name-class (safe-name def))
                              (entry-status defs)))))
        (:same-name
         (make-section
@@ -327,13 +328,13 @@
                   (iter (for def in defs)
                         (collecting (span (down (doctype def)) "doctype"))))
                  (fdiv
-                  (span-id (name def) "name"))
+                  (span-id (safe-name def) "name"))
                  (print-package def)
                  (print-args def))
           ;; the entire entry is hidden based on the package and
           ;; external/internal status
-          :metadata (classes (symbol-package-name-class (name def))
-                             (symbol-status (name def))))))
+          :metadata (classes (symbol-package-name-class (safe-name def))
+                             (symbol-status (safe-name def))))))
        ((nil)
         (assert (= 1 (length defs)))
         (if (not (eq 'static-file (doctype def))) 
@@ -343,12 +344,12 @@
                (fdiv
                 (span (down (doctype def)) "doctype"))
                (fdiv
-                (span-id (name def) "name"))
+                (span-id (safe-name def) "name"))
                (print-args def))
               ;; the entire entry is hidden based on the package and
               ;; external/internal status
-              :metadata (classes (symbol-package-name-class (name def))
-                                 (symbol-status (name def)))))
+              :metadata (classes (symbol-package-name-class (safe-name def))
+                                 (symbol-status (safe-name def)))))
             ;; process the static file
             (make-content nil :metadata (classes "static-file")))))
      :metadata (classes "entry"))))

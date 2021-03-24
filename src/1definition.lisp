@@ -1,9 +1,13 @@
 (in-package :eazy-documentation)
 
+(deftype name ()
+  `(or symbol
+       (cons (eql setf) (cons symbol null))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defclass def ()
     ((doctype   :accessor   doctype :initarg :doctype   :type symbol)
-     (name      :accessor      name :initarg :name      :type symbol)
+     (name      :accessor      name :initarg :name      :type name)
      (args      :accessor      args :initarg :args      :type list)
      (docstring :accessor docstring :initarg :docstring :type string)
      (file      :accessor      file :initarg :file      :type pathname
