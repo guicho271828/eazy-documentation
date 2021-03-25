@@ -1,11 +1,11 @@
 
-# Eazy-Documentation [![img](https://travis-ci.org/eazy-documentation/eazy-documentation.svg)](https://travis-ci.org/numcl/numcl)
+# Eazy-Documentation [![img](https://travis-ci.org/guicho271828/eazy-documentation.svg)](https://travis-ci.org/guicho271828/eazy-documentation)
 
 -   **One-shot solution to the CL library documentation generator.**
     -   It **does not require any custom macro/read-macro for annotating your API.**
-        Existing documentation generator supports only a limited number of macros (e.g. `defun`),
+        Existing documentation generators supports only a limited number of macros (e.g. `defun`),
         or requires a user-defined extensions to the parser that extracts the
-        documentation strings (e.g. see [docparser](http://quickdocs.org/docparser/)).  In contrast, this library runs based on the heuristic
+        documentation strings (e.g. see [docparser](https://github.com/eudoxia0/docparser)).  In contrast, this library runs based on the heuristic
         decision and ranking.
     -   It **searches the repository for any potential documentation files and embed**
         **them in the output as html**. Some library (especially the old ones like CFFI)
@@ -54,7 +54,7 @@ Options:
 | :toc            | Generate a table of contents (toc)                                        |
 | :max-depth      | The maximum depth of a toc                                                |
 |                 |                                                                           |
-| :template-class | COMMON-HTML template class, no need to be chanded.                        |
+| :template-class | COMMON-HTML template class, no need to be changed.                        |
 | :css-list       | List of CSS scripts to be added to the template.                          |
 | :js-list        | List of Javascripts to be added to the template.                          |
 | :font-list      | List of Google fonts to be added to the template.                         |

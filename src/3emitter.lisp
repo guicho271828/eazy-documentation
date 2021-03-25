@@ -51,18 +51,28 @@
 (defun process-black-white-list (defs blacklist whitelist external-only)
   (setf blacklist (mapcar #'find-package blacklist))
   (setf whitelist (mapcar #'find-package whitelist))
-  (delete-if
+  (remove-if
    (lambda (def)
      (let ((name (safe-name def)))
-       (or (some (curry #'find-symbol (symbol-name name)) blacklist)
-           (and whitelist
-                ;; skip if the name is not in the whitelist, if provided
-                (notany (curry #'find-symbol (symbol-name name)) whitelist))
-           (when external-only
-             (or (null (symbol-package name)) ; for gensyms
-                 (not (eq :external
-                          (nth-value 1 (find-symbol (symbol-name name)
-                                                    (symbol-package name))))))))))
+       (or (when (some (curry #'find-symbol (symbol-name name)) blacklist)
+             (note "removed by blacklist: ~_~a" def)
+             t)
+           (when (and whitelist
+                      ;; skip if the name is not in the whitelist, if provided
+                      (notany (curry #'find-symbol (symbol-name name)) whitelist))
+             (note "removed because not in whitelist: ~_~a" def)
+             t)
+           (when (when external-only
+                   (or (null (symbol-package name)) ; for gensyms
+                       (not (eq :external (symbol-status name)))))
+             (note "removed because ~a is not external in its own package ~a: ~_~a" name (symbol-package name) def)
+             t)
+           (when (when external-only
+                   (when (not (keywordp (doctype def)))
+                     (not (eq :external (symbol-status (doctype def))))))
+             (note "removed because ~a definer/doctype is not external (i.e., an unexported macro) in its own package ~a: ~_~a"
+                   (doctype def) (symbol-package (doctype def)) def)
+             t))))
    defs))
 
 (defun generate-commondoc (defs &rest args &key . #.+keywords+)
@@ -233,16 +243,26 @@
   (make-text (string string)
              :metadata (when classes (apply #'classes classes))))
 
-(defun span-id (sym &rest classes)
+(defun span-id (name &rest classes)
   "Create a span element with an id based on SYM."
-  (declare (symbol sym))
-  (let ((id (format nil "~a:~a"
-                    (package-name (symbol-package sym))
-                    (symbol-name sym))))
-    (setf (gethash sym *ids*) id)
-    (make-text (string-downcase sym)
-               :metadata (when classes (apply #'classes classes))
-               :reference id)))
+  (declare (name name))
+  (ematch name
+    ((list 'setf sym)
+     (let ((id (format nil "(setf ~a:~a)"
+                       (package-name (symbol-package sym))
+                       (symbol-name sym))))
+       (setf (gethash sym *ids*) id)
+       (make-text (format nil "(setf ~(~a~))" (symbol-name sym))
+                  :metadata (when classes (apply #'classes classes))
+                  :reference id)))
+    ((and (symbol) sym)
+     (let ((id (format nil "~a:~a"
+                       (package-name (symbol-package sym))
+                       (symbol-name sym))))
+       (setf (gethash sym *ids*) id)
+       (make-text (string-downcase sym)
+                  :metadata (when classes (apply #'classes classes))
+                  :reference id)))))
 
 (defun par (string &rest classes)
   (make-content
@@ -274,10 +294,11 @@
   (flet ((down (x) (string-downcase (princ-to-string x))))
     (span (down (package-name (symbol-package (safe-name def)))) "package")))
 
-(defun symbol-package-name-class (name)
+(defun symbol-package-name-class (sym)
+  (declare (symbol sym))
   (format nil "pkg-~a"
           (package-name
-           (symbol-package name))))
+           (symbol-package sym))))
 
 (defun symbol-status (sym)
   (declare (symbol sym))
@@ -289,7 +310,7 @@
 
 (defun entry-status (defs)
   (if (find :external defs
-            :key (lambda (def) (symbol-status (name def))))
+            :key (lambda (def) (symbol-status (safe-name def))))
       ;; if no :external is found, then
       ;; the whole entry is also marked internal
       :external
@@ -307,12 +328,12 @@
                  (fdiv
                   (iter (for def in defs)
                         (collecting
-                          (span-id (name def) "name" (symbol-status (name def))))))
+                          (span-id (name def) "name" (symbol-status (safe-name def))))))
                  (print-package def) 
                  (print-args def))
           ;; the entire entry is hidden based on the package and
           ;; external/internal status
-          :metadata (classes (symbol-package-name-class (name def))
+          :metadata (classes (symbol-package-name-class (safe-name def))
                              (entry-status defs)))))
        (:same-name
         (make-section
@@ -326,8 +347,8 @@
                  (print-args def))
           ;; the entire entry is hidden based on the package and
           ;; external/internal status
-          :metadata (classes (symbol-package-name-class (name def))
-                             (symbol-status (name def))))))
+          :metadata (classes (symbol-package-name-class (safe-name def))
+                             (symbol-status (safe-name def))))))
        ((nil)
         (assert (= 1 (length defs)))
         (if (not (eq 'static-file (doctype def))) 
@@ -341,8 +362,8 @@
                (print-args def))
               ;; the entire entry is hidden based on the package and
               ;; external/internal status
-              :metadata (classes (symbol-package-name-class (name def))
-                                 (symbol-status (name def)))))
+              :metadata (classes (symbol-package-name-class (safe-name def))
+                                 (symbol-status (safe-name def)))))
             ;; process the static file
             (make-content nil :metadata (classes "static-file")))))
      :metadata (classes "entry"))))

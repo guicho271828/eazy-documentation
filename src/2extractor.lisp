@@ -3,12 +3,17 @@
 (defvar *defs*)
 (defvar *old-macroexpand-hook*)
 (defvar *deferred-tasks*)
+(setf (documentation '*deferred-tasks* 'variable)
+      "A list of thunks. Each thunk contains code to extract the docstring after loading the system.
+This variable is mainly used for parsing (setf (documentation ...)) forms
+because the docstring may not be available in the macro expansion time unlike macros such as DEFUN.")
 
 (defun add-def (&rest initargs &key doctype name args docstring file)
   (declare (ignore doctype name args docstring file))
   (let ((obj (apply #'make-instance 'def initargs)))
     (if-let ((it (find obj *defs* :test #'def=)))
       (progn
+        (note "same def found, merging: ~_~a, ~_~a" it obj)
         (merge-slot obj it 'args)
         (merge-slot obj it 'docstring))
       (vector-push-extend obj *defs* (max 1 (length *defs*))))))
@@ -27,6 +32,7 @@
   (funcall *old-macroexpand-hook* expander form env))
 
 (defun extract-definitions (form)
+  (note "parsing ~a..." (first form))
   (match form
     #+(or)
     ((list* 'setf args)
@@ -34,6 +40,7 @@
     ((list* macro _)
      (when (macro-function macro)
        (when (eql 0 (search "DEF" (symbol-name macro)))
+         (note "This looks like a define macro")
          (parse-def form))))))
 
 (defun natural-language-string-p (string)
@@ -137,6 +144,7 @@
      
      (apply #'add-def acc))))
 
+;; still unused
 (defun parse-setf (args)
   (match args
     (nil
@@ -150,14 +158,15 @@
                           :doctype (case type
                                      (function 'defun)
                                      (variable
-                                      (if (constantp name)
+                                      (if (char= #\+ (aref (symbol-name name) 0))
                                           'defconstant
                                           'defvar))
                                      (structure 'defstruct)
                                      (type 'deftype)
                                      (method-combination 'define-method-combination)
                                      (setf 'defsetf)
-                                     (compiler-macro 'define-compiler-macro))
+                                     (compiler-macro 'define-compiler-macro)
+                                     (t type))
                           :docstring (documentation name type)))
                *deferred-tasks*)))
      (parse-setf rest))))

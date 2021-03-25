@@ -1,9 +1,13 @@
 (in-package :eazy-documentation)
 
+(deftype name ()
+  `(or symbol
+       (cons (eql setf) (cons symbol null))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defclass def ()
     ((doctype   :accessor   doctype :initarg :doctype   :type symbol)
-     (name      :accessor      name :initarg :name      :type symbol)
+     (name      :accessor      name :initarg :name      :type name)
      (args      :accessor      args :initarg :args      :type list)
      (docstring :accessor docstring :initarg :docstring :type string)
      (file      :accessor      file :initarg :file      :type pathname
@@ -30,10 +34,11 @@
 (defun def= (a b)
   "Compare the name and the doctype. Returns true when they are both EQ."
   (ematch* (a b)
-    (((def :doctype d1 :safe-name n1)
-      (def :doctype d2 :safe-name n2))
+    (((def :doctype d1 :safe-name n1 :args (place a1))
+      (def :doctype d2 :safe-name n2 :args (place a2)))
      (and (eq d1 d2)
-          (eq n1 n2)))))
+          (eq n1 n2)
+          (equal (ignore-errors a1) (ignore-errors a2))))))
 
 (defun def~ (a b)
   "Compare the name (and its package), doctype, file, args, docstring.
